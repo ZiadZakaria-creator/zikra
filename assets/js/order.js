@@ -20,6 +20,7 @@ Z.boot('cart').then((cat) => {
     ${o.payment === 'wallet' ? `<div class="co-box"><h2>بيانات التحويل</h2>
       <p>حوّل <b>${Z.money(o.total)}</b> على المحفظة أو إنستاباي:</p>
       <div class="order-id"><bdi dir="ltr">${esc(s.walletNumber)}</bdi><button class="chip" data-copy-wallet>انسخ</button></div>
+      ${s.walletName ? `<p class="policy-note">اتأكد إن الاسم اللي هيظهرلك وانت بتحوّل: <b>${esc(s.walletName)}</b></p>` : ''}
       <p class="policy-note">ابعت صورة التحويل على واتساب مع رقم الأوردر. هنبدأ نجهّز الطلب بعد ما نتأكد من التحويل.</p></div>` : ''}
     <div class="co-box"><h2>ملخص الطلب</h2>
       <ul class="sum-items">${o.items.map((i) => `<li><span><bdi>${esc(i.name)}</bdi> <small>${i.size} مل × ${i.qty}</small></span><b>${Z.money(i.total)}</b></li>`).join('')}</ul>

@@ -3,8 +3,8 @@
   "generatedAt": "2026-11-27T00:00:00Z",
   "settings": {
     "storeName": "ذِكرى",
-    "whatsapp": "",
-    "walletNumber": "01599573883",
+    "whatsapp": "201500573883",
+    "walletNumber": "01500573883",
     "deliveryDays": "3 أيام عمل",
     "areas": "كل محافظات مصر",
     "instagram": "",
@@ -177,7 +177,8 @@
       "cod": true,
       "wallet": true
     },
-    "announcement": "توصيل لكل محافظات مصر · الدفع عند الاستلام"
+    "announcement": "توصيل لكل محافظات مصر · الدفع عند الاستلام",
+    "walletName": "غرام ه*** ع***"
   },
   "products": [
     {
