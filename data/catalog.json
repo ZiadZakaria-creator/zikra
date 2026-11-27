@@ -3,12 +3,182 @@
   "generatedAt": "2026-11-27T00:00:00Z",
   "settings": {
     "storeName": "ذِكرى",
-    "whatsapp": "",
-    "walletNumber": "01599573883",
+    "whatsapp": "201500573883",
+    "walletNumber": "01500573883",
     "deliveryDays": "3 أيام عمل",
-    "areas": "القاهرة والجيزة",
+    "areas": "كل محافظات مصر",
     "instagram": "",
-    "tiktok": ""
+    "tiktok": "",
+    "governorates": [
+      {
+        "id": "cairo",
+        "name": "القاهرة",
+        "fee": 85,
+        "days": "3 أيام عمل"
+      },
+      {
+        "id": "giza",
+        "name": "الجيزة",
+        "fee": 85,
+        "days": "3 أيام عمل"
+      },
+      {
+        "id": "alex",
+        "name": "الإسكندرية",
+        "fee": 120,
+        "days": ""
+      },
+      {
+        "id": "qalyubia",
+        "name": "القليوبية",
+        "fee": 120,
+        "days": ""
+      },
+      {
+        "id": "sharqia",
+        "name": "الشرقية",
+        "fee": 120,
+        "days": ""
+      },
+      {
+        "id": "dakahlia",
+        "name": "الدقهلية",
+        "fee": 120,
+        "days": ""
+      },
+      {
+        "id": "gharbia",
+        "name": "الغربية",
+        "fee": 120,
+        "days": ""
+      },
+      {
+        "id": "monufia",
+        "name": "المنوفية",
+        "fee": 120,
+        "days": ""
+      },
+      {
+        "id": "beheira",
+        "name": "البحيرة",
+        "fee": 120,
+        "days": ""
+      },
+      {
+        "id": "kafr-elsheikh",
+        "name": "كفر الشيخ",
+        "fee": 120,
+        "days": ""
+      },
+      {
+        "id": "damietta",
+        "name": "دمياط",
+        "fee": 120,
+        "days": ""
+      },
+      {
+        "id": "port-said",
+        "name": "بورسعيد",
+        "fee": 120,
+        "days": ""
+      },
+      {
+        "id": "ismailia",
+        "name": "الإسماعيلية",
+        "fee": 120,
+        "days": ""
+      },
+      {
+        "id": "suez",
+        "name": "السويس",
+        "fee": 120,
+        "days": ""
+      },
+      {
+        "id": "fayoum",
+        "name": "الفيوم",
+        "fee": 120,
+        "days": ""
+      },
+      {
+        "id": "beni-suef",
+        "name": "بني سويف",
+        "fee": 120,
+        "days": ""
+      },
+      {
+        "id": "minya",
+        "name": "المنيا",
+        "fee": 120,
+        "days": ""
+      },
+      {
+        "id": "assiut",
+        "name": "أسيوط",
+        "fee": 120,
+        "days": ""
+      },
+      {
+        "id": "sohag",
+        "name": "سوهاج",
+        "fee": 120,
+        "days": ""
+      },
+      {
+        "id": "qena",
+        "name": "قنا",
+        "fee": 200,
+        "days": ""
+      },
+      {
+        "id": "luxor",
+        "name": "الأقصر",
+        "fee": 200,
+        "days": ""
+      },
+      {
+        "id": "aswan",
+        "name": "أسوان",
+        "fee": 200,
+        "days": ""
+      },
+      {
+        "id": "red-sea",
+        "name": "البحر الأحمر",
+        "fee": 200,
+        "days": ""
+      },
+      {
+        "id": "new-valley",
+        "name": "الوادي الجديد",
+        "fee": 200,
+        "days": ""
+      },
+      {
+        "id": "matrouh",
+        "name": "مطروح",
+        "fee": 200,
+        "days": ""
+      },
+      {
+        "id": "north-sinai",
+        "name": "شمال سيناء",
+        "fee": 200,
+        "days": ""
+      },
+      {
+        "id": "south-sinai",
+        "name": "جنوب سيناء",
+        "fee": 200,
+        "days": ""
+      }
+    ],
+    "payment": {
+      "cod": true,
+      "wallet": true
+    },
+    "announcement": "توصيل لكل محافظات مصر · الدفع عند الاستلام",
+    "walletName": "غرام ه*** ع***"
   },
   "products": [
     {
