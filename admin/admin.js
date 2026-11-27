@@ -140,14 +140,29 @@ function viewOrders() {
   v.innerHTML = `<div class="a-bar"><h1>الطلبات</h1><input class="a-search" id="q" placeholder="رقم الأوردر أو الموبايل أو الاسم" value="${esc(S.q)}"></div>
     <div class="chips" style="margin-bottom:14px"><button class="chip ${S.filter === 'all' ? 'on' : ''}" data-f="all">الكل (${S.orders.length})</button>
     ${STATUS.map(([k, l]) => `<button class="chip ${S.filter === k ? 'on' : ''}" data-f="${k}">${l} (${counts[k]})</button>`).join('')}</div>
-    <div class="a-list">${list.length ? list.map((o) => `<button class="o-card" data-o="${esc(o.id)}">
+    <div class="a-list">${list.length ? list.map((o) => `<div class="o-row"><button class="o-card" data-o="${esc(o.id)}">
       <div><div class="id"><bdi>${esc(o.id)}</bdi> ${priceIssues(o).length ? '<span class="warn-ic" title="فيه اختلاف في الأسعار">⚠</span>' : ''}</div><div class="meta">${fmtDate(o.createdAt)}</div></div>
       <div><div>${esc(o.customer?.name)}</div><div class="meta"><bdi dir="ltr">${esc(o.customer?.phone)}</bdi> · ${esc(o.address?.govName)}</div></div>
       <div class="tot">${money(o.total)}<div class="meta">${o.payment === 'wallet' ? 'محفظة' : 'عند الاستلام'}</div></div>
-      <span class="st st-${o.status}">${STATUS_L[o.status] || o.status}</span></button>`).join('') : '<p class="empty">مفيش طلبات هنا.</p>'}</div>`;
+      <span class="st st-${o.status}">${STATUS_L[o.status] || o.status}</span></button>
+      <button class="o-del" data-del="${esc(o.id)}" aria-label="امسح الطلب ${esc(o.id)}" title="امسح الطلب نهائياً">${TRASH}</button></div>`).join('') : '<p class="empty">مفيش طلبات هنا.</p>'}</div>`;
   $('#q').oninput = (e) => { S.q = e.target.value; const pos = e.target.selectionStart; viewOrders(); const el = $('#q'); el.focus(); el.setSelectionRange(pos, pos); };
   v.querySelectorAll('[data-f]').forEach((b) => (b.onclick = () => { S.filter = b.dataset.f; viewOrders(); }));
   v.querySelectorAll('[data-o]').forEach((b) => (b.onclick = () => openOrder(b.dataset.o)));
+  v.querySelectorAll('[data-del]').forEach((b) => (b.onclick = () => deleteOrder(b.dataset.del)));
+}
+
+const TRASH = '<svg class="icon" viewBox="0 0 24 24" width="20" height="20"><path d="M4 7h16M9 7V4h6v3M6 7l1 13h10l1-13M10 11v6M14 11v6"/></svg>';
+/* Only cancelled orders can be deleted: cancelling first gives the stock back,
+   and a live order can't vanish by a mis-click. */
+async function deleteOrder(id) {
+  const o = S.orders.find((x) => x.id === id); if (!o) return;
+  if (o.status !== 'cancelled') return alert('علشان المخزون يرجع ومايتمسحش طلب شغال بالغلط:\nافتح الطلب ودوس "اتلغى" الأول، وبعدين امسحه.');
+  if (!confirm(`تمسح الطلب ${o.id} (${o.customer?.name || ''}) نهائياً؟ مش هتقدر ترجّعه.`)) return;
+  await guard(() => deleteDoc(doc(db, 'orders', id)), 'اتمسح الطلب');
+  S.orders = S.orders.filter((x) => x.id !== id);
+  document.querySelector('.modal')?.remove();
+  renderShell();
 }
 
 function waTemplates(o) {
@@ -188,7 +203,7 @@ function openOrder(id) {
     <div class="box" style="margin-top:12px"><h3>رسايل واتساب جاهزة</h3><div class="btn-row">
       ${waTemplates(o).map(([l, t]) => `<a class="btn btn-wa btn-sm" target="_blank" rel="noopener" href="${waTo(o.customer.phone, t)}">${l}</a>`).join('')}</div></div>
     <div class="box" style="margin-top:12px"><h3>ملاحظة داخلية</h3><textarea id="anote" rows="2" class="a-search" style="border-radius:12px">${esc(o.adminNote || '')}</textarea>
-      <div class="btn-row"><button class="btn btn-line btn-sm" id="savenote">احفظ الملاحظة</button><button class="btn btn-dark btn-sm" id="print">اطبع الفاتورة</button></div></div>
+      <div class="btn-row"><button class="btn btn-line btn-sm" id="savenote">احفظ الملاحظة</button><button class="btn btn-dark btn-sm" id="print">اطبع الفاتورة</button>${o.status === 'cancelled' ? '<button class="btn btn-danger btn-sm" id="delo">امسح الطلب نهائياً</button>' : ''}</div></div>
     ${(o.history || []).length ? `<div class="box" style="margin-top:12px"><h3>السجل</h3>${o.history.map((h) => `<div class="meta">${fmtDate(h.at)} · ${STATUS_L[h.status] || h.status} · ${esc(h.by || '')}</div>`).join('')}</div>` : ''}
   </div>`;
   document.body.appendChild(m);
@@ -201,6 +216,7 @@ function openOrder(id) {
   }));
   $('#savenote', m).onclick = () => guard(async () => { await updateDoc(doc(db, 'orders', o.id), { adminNote: $('#anote', m).value.trim() }); o.adminNote = $('#anote', m).value.trim(); }, 'اتحفظت');
   $('#print', m).onclick = () => printInvoice(o);
+  const delo = $('#delo', m); if (delo) delo.onclick = () => deleteOrder(o.id);
 }
 
 /* Stock moves with the order: taken on confirm, given back on cancel. */
