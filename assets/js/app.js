@@ -81,18 +81,89 @@
     </article>`;
   }
 
-  // ---------- Cart (full cart page comes in phase B) ----------
+  // ---------- Cart ----------
   const CART_KEY = 'zikra_cart';
   const cart = {
     items() { return store.get(CART_KEY, []); },
+    save(items) { store.set(CART_KEY, items); updateBadges(); },
     count() { return cart.items().reduce((n, i) => n + i.qty, 0); },
     add(id, size, qty = 1) {
       const items = cart.items();
       const hit = items.find((i) => i.id === id && i.size === size);
       if (hit) hit.qty += qty; else items.push({ id, size, qty });
-      store.set(CART_KEY, items); updateBadges();
+      cart.save(items);
+    },
+    setQty(id, size, qty) {
+      const items = cart.items().map((i) => (i.id === id && i.size === size ? { ...i, qty } : i)).filter((i) => i.qty > 0);
+      cart.save(items);
+    },
+    remove(id, size) { cart.save(cart.items().filter((i) => !(i.id === id && i.size === size))); },
+    clear() { cart.save([]); },
+    /* Resolve stored items against the catalog: drops removed products, caps qty at stock */
+    lines(catalog) {
+      const out = [];
+      for (const i of cart.items()) {
+        const p = catalog.products.find((x) => x.id === i.id);
+        const v = p && p.variants.find((x) => x.size === i.size);
+        if (!p || !v) continue;
+        const qty = Math.max(0, Math.min(i.qty, v.stock));
+        out.push({ p, v, qty, wanted: i.qty, total: qty * v.price });
+      }
+      return out;
     }
   };
+
+  // ---------- Orders ----------
+  // Phase B keeps orders on this device; phase C swaps save() for a Firestore write.
+  const ORDERS_KEY = 'zikra_orders';
+  const orders = {
+    newId() {
+      const d = new Date(); const pad = (n) => String(n).padStart(2, '0');
+      const abc = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789'; // no 0/O/1/I to avoid misreading
+      const rnd = new Uint32Array(4); (window.crypto || window.msCrypto).getRandomValues(rnd);
+      const tail = Array.from(rnd, (n) => abc[n % abc.length]).join('');
+      return `ZK-${String(d.getFullYear()).slice(2)}${pad(d.getMonth() + 1)}${pad(d.getDate())}-${tail}`;
+    },
+    async save(order) { const all = store.get(ORDERS_KEY, []); all.unshift(order); store.set(ORDERS_KEY, all.slice(0, 20)); return order.id; },
+    get(id) { return store.get(ORDERS_KEY, []).find((o) => o.id === id) || null; }
+  };
+
+  // Demo coupons only exist until the admin panel (phase C) manages real ones.
+  const DEMO_COUPONS = { ZIKRA10: { percent: 10, expires: '2026-12-31' } };
+  async function checkCoupon(code, demo) {
+    const c = String(code || '').trim().toUpperCase();
+    if (!c) return null;
+    const hit = demo ? DEMO_COUPONS[c] : null;
+    if (!hit) return { ok: false, msg: 'الكود ده مش صحيح' };
+    if (new Date(hit.expires + 'T23:59:59') < new Date()) return { ok: false, msg: 'الكود ده انتهى' };
+    return { ok: true, code: c, percent: hit.percent };
+  }
+
+  const normPhone = (s) => String(s || '').replace(/[٠-٩]/g, (d) => '٠١٢٣٤٥٦٧٨٩'.indexOf(d)).replace(/\D/g, '').replace(/^20(?=1)/, '0');
+  const validPhone = (s) => /^01[0125]\d{8}$/.test(normPhone(s));
+
+  function orderText(o) {
+    const lines = o.items.map((i) => `- ${i.name} (${i.size} مل) × ${i.qty} = ${money(i.total)}`).join('\n');
+    return [
+      `طلب جديد من موقع ذِكرى`,
+      `رقم الأوردر: ${o.id}`,
+      ``,
+      `الاسم: ${o.customer.name}`,
+      `التليفون: ${o.customer.phone}${o.customer.phone2 ? ' / ' + o.customer.phone2 : ''}`,
+      `العنوان: ${o.address.govName} - ${o.address.zoneName} - ${o.address.street}${o.address.landmark ? ' (علامة مميزة: ' + o.address.landmark + ')' : ''}`,
+      ``,
+      `المنتجات:`,
+      lines,
+      ``,
+      `المجموع: ${money(o.subtotal)}`,
+      o.discount ? `الخصم (${o.coupon}): -${money(o.discount)}` : null,
+      `الشحن: ${money(o.shipping)}`,
+      `الإجمالي: ${money(o.total)}`,
+      `الدفع: ${o.payment === 'wallet' ? 'محفظة / إنستاباي' : 'عند الاستلام'}`,
+      o.notes ? `ملاحظات: ${o.notes}` : null
+    ].filter((x) => x !== null).join('\n');
+  }
+
   function updateBadges() {
     const n = cart.count();
     document.querySelectorAll('[data-cart-count]').forEach((b) => { b.textContent = n || ''; b.dataset.n = n; });
@@ -198,5 +269,5 @@
     }
   }
 
-  window.Z = { LABELS, BUDGETS, I, esc, money, store, loadCatalog, minPrice, inStock, productUrl, familyLine, subLine, card, cart, toast, waLink, boot };
+  window.Z = { LABELS, BUDGETS, I, esc, money, store, loadCatalog, minPrice, inStock, productUrl, familyLine, subLine, card, cart, orders, checkCoupon, normPhone, validPhone, orderText, toast, waLink, boot };
 })();

@@ -8,7 +8,125 @@
     "deliveryDays": "3 أيام عمل",
     "areas": "القاهرة والجيزة",
     "instagram": "",
-    "tiktok": ""
+    "tiktok": "",
+    "governorates": [
+      {
+        "id": "cairo",
+        "name": "القاهرة"
+      },
+      {
+        "id": "giza",
+        "name": "الجيزة"
+      }
+    ],
+    "shippingZones": [
+      {
+        "id": "nasr-city",
+        "gov": "cairo",
+        "name": "مدينة نصر",
+        "fee": 60
+      },
+      {
+        "id": "heliopolis",
+        "gov": "cairo",
+        "name": "مصر الجديدة",
+        "fee": 60
+      },
+      {
+        "id": "downtown",
+        "gov": "cairo",
+        "name": "وسط البلد",
+        "fee": 55
+      },
+      {
+        "id": "maadi",
+        "gov": "cairo",
+        "name": "المعادي",
+        "fee": 65
+      },
+      {
+        "id": "new-cairo",
+        "gov": "cairo",
+        "name": "التجمع الخامس",
+        "fee": 75
+      },
+      {
+        "id": "shorouk",
+        "gov": "cairo",
+        "name": "الشروق",
+        "fee": 85
+      },
+      {
+        "id": "madinaty",
+        "gov": "cairo",
+        "name": "مدينتي",
+        "fee": 85
+      },
+      {
+        "id": "obour",
+        "gov": "cairo",
+        "name": "العبور",
+        "fee": 85
+      },
+      {
+        "id": "shubra",
+        "gov": "cairo",
+        "name": "شبرا",
+        "fee": 55
+      },
+      {
+        "id": "helwan",
+        "gov": "cairo",
+        "name": "حلوان",
+        "fee": 75
+      },
+      {
+        "id": "dokki",
+        "gov": "giza",
+        "name": "الدقي",
+        "fee": 55
+      },
+      {
+        "id": "mohandessin",
+        "gov": "giza",
+        "name": "المهندسين",
+        "fee": 55
+      },
+      {
+        "id": "haram",
+        "gov": "giza",
+        "name": "الهرم",
+        "fee": 60
+      },
+      {
+        "id": "faisal",
+        "gov": "giza",
+        "name": "فيصل",
+        "fee": 60
+      },
+      {
+        "id": "october",
+        "gov": "giza",
+        "name": "6 أكتوبر",
+        "fee": 80
+      },
+      {
+        "id": "zayed",
+        "gov": "giza",
+        "name": "الشيخ زايد",
+        "fee": 80
+      },
+      {
+        "id": "hadayek-ahram",
+        "gov": "giza",
+        "name": "حدائق الأهرام",
+        "fee": 70
+      }
+    ],
+    "payment": {
+      "cod": true,
+      "wallet": true
+    }
   },
   "products": [
     {

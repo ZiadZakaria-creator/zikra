@@ -65,7 +65,7 @@ Z.boot('shop').then((cat) => {
     if (sz) { variant = p.variants.find((v) => v.size === +sz.dataset.size); update(); }
     const th = e.target.closest('[data-img]');
     if (th) { document.getElementById('main-img').src = th.dataset.img; document.querySelectorAll('[data-img]').forEach((b) => b.classList.toggle('on', b === th)); }
-    if (e.target.closest('#order-now,[data-order]')) { Z.cart.add(p.id, variant.size); location.href = 'cart.html'; }
+    if (e.target.closest('#order-now,[data-order]')) { Z.cart.add(p.id, variant.size); location.href = 'checkout.html'; }
   });
   update();
 

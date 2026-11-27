@@ -184,3 +184,49 @@ prose('contact.html','تواصل معانا','تواصل مع ذِكرى على 
 <div class="contact-cards" id="contact-cards"></div>
 ''')
 print('ok')
+
+# ---------- Phase B: cart, checkout, order confirmation ----------
+NOINDEX = '<meta name="robots" content="noindex">'
+def page_noindex(name, title, body, script):
+    html = HEAD.format(title=title, desc='', body=body.strip(), script=script)
+    html = html.replace('<meta name="description" content="">', NOINDEX)
+    (ROOT / name).write_text(html, encoding='utf-8')
+
+page_noindex('cart.html', 'السلة | ذِكرى', '''
+<section class="page-head"><div class="wrap"><div class="eyebrow">Cart</div><h1>السلة</h1></div></section>
+<div class="wrap"><div class="cart-layout" id="cart"></div></div>
+''', 'cart')
+
+page_noindex('checkout.html', 'تأكيد الطلب | ذِكرى', '''
+<section class="page-head"><div class="wrap"><div class="eyebrow">Checkout</div><h1>تأكيد الطلب</h1><p>من غير تسجيل دخول. بياناتك بنستخدمها للتوصيل بس.</p></div></section>
+<div class="wrap"><form class="checkout" id="checkout" novalidate>
+  <div class="co-main">
+    <fieldset class="co-box"><legend>بياناتك</legend>
+      <div class="field"><label for="name">الاسم</label><input id="name" name="name" autocomplete="name" required maxlength="60"><small class="err"></small></div>
+      <div class="field"><label for="phone">رقم الموبايل</label><input id="phone" name="phone" type="tel" inputmode="tel" autocomplete="tel" placeholder="01xxxxxxxxx" required dir="ltr"><small class="err"></small></div>
+      <div class="field"><label for="phone2">رقم تاني <span class="opt">(اختياري)</span></label><input id="phone2" name="phone2" type="tel" inputmode="tel" dir="ltr"><small class="err"></small></div>
+    </fieldset>
+    <fieldset class="co-box"><legend>العنوان</legend>
+      <div class="field-row">
+        <div class="field"><label for="gov">المحافظة</label><select id="gov" name="gov" required></select><small class="err"></small></div>
+        <div class="field"><label for="zone">المنطقة</label><select id="zone" name="zone" required><option value="">اختار المحافظة الأول</option></select><small class="err"></small></div>
+      </div>
+      <div class="field"><label for="street">العنوان بالتفصيل</label><textarea id="street" name="street" rows="2" required maxlength="250" placeholder="الشارع، رقم العمارة، الدور، الشقة"></textarea><small class="err"></small></div>
+      <div class="field"><label for="landmark">علامة مميزة <span class="opt">(اختياري)</span></label><input id="landmark" name="landmark" maxlength="100"></div>
+    </fieldset>
+    <fieldset class="co-box"><legend>طريقة الدفع</legend>
+      <div class="pay-opts" id="pay-opts"></div>
+    </fieldset>
+    <fieldset class="co-box"><legend>ملاحظات <span class="opt">(اختياري)</span></legend>
+      <div class="field"><textarea id="notes" name="notes" rows="2" maxlength="300" aria-label="ملاحظات"></textarea></div>
+      <label class="check"><input type="checkbox" id="remember" checked> احفظ بياناتي على الجهاز ده للمرة الجاية</label>
+    </fieldset>
+  </div>
+  <aside class="co-summary" id="summary"></aside>
+</form></div>
+''', 'checkout')
+
+page_noindex('order.html', 'تم الطلب | ذِكرى', '''
+<div class="wrap"><div class="order-done" id="order"></div></div>
+''', 'order')
+print('phase b pages ok')
