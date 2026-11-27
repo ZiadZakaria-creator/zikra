@@ -330,6 +330,38 @@
     if ('serviceWorker' in navigator && location.protocol === 'https:') navigator.serviceWorker.register('sw.js').catch(() => {});
   }
 
+  // ---------- Visitor counter ----------
+  // One write per browser per day (Cairo time) to stats/{YYYY-MM-DD}: v += 1 and the landing source += 1.
+  // Pageviews are not counted on purpose: every write uses the free daily Firestore quota that orders need too.
+  function visitSource() {
+    const q = new URLSearchParams(location.search), ua = navigator.userAgent;
+    const utm = (q.get('utm_source') || '').toLowerCase();
+    let ref = ''; try { ref = document.referrer ? new URL(document.referrer).hostname : ''; } catch (e) { /* ignore */ }
+    if (ref === location.hostname) ref = '';
+    const hit = (re) => re.test(utm) || re.test(ref);
+    if (/Instagram/.test(ua) || hit(/instagram|^ig$/)) return 'instagram';
+    if (/FBAN|FBAV/.test(ua) || q.has('fbclid') || hit(/facebook|^fb$|fb\.com/)) return 'facebook';
+    if (q.has('ttclid') || hit(/tiktok/)) return 'tiktok';
+    if (q.has('gclid') || hit(/google/)) return 'google';
+    if (hit(/whatsapp|wa\.me/)) return 'whatsapp';
+    return utm || ref ? 'other' : 'direct';
+  }
+  function countVisit() {
+    try {
+      if (!BUILT && !window.FIRESTORE_EMULATOR) return; // never count local previews against the live database
+      if (navigator.webdriver || /bot|crawl|spider|lighthouse|headless|preview/i.test(navigator.userAgent)) return;
+      const day = new Intl.DateTimeFormat('en-CA', { timeZone: 'Africa/Cairo' }).format(new Date());
+      if (localStorage.getItem('zikra_seen') === day) return;
+      localStorage.setItem('zikra_seen', day);
+      const src = visitSource();
+      const name = `projects/${FB.projectId}/databases/(default)/documents/stats/${day}`;
+      const inc = (fieldPath) => ({ fieldPath, increment: { integerValue: '1' } });
+      const body = { writes: [{ transform: { document: name, fieldTransforms: [inc('v'), inc('s_' + src)] } }] };
+      fetch(`${fsBase()}:commit?key=${FB.apiKey}`, { method: 'POST', keepalive: true, headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) })
+        .then((r) => { if (!r.ok) localStorage.removeItem('zikra_seen'); }).catch(() => localStorage.removeItem('zikra_seen'));
+    } catch (e) { /* counting must never break the shop */ }
+  }
+
   async function boot(active) {
     try {
       const catalog = await loadCatalog();
@@ -338,6 +370,7 @@
       loadAnalytics(catalog.settings);
       registerSW();
       bindQuickAdd(catalog);
+      setTimeout(countVisit, 1500);
       return catalog;
     } catch (err) {
       const main = document.querySelector('main');
