@@ -12,9 +12,11 @@ Z.boot('cart').then((cat) => {
   gov.addEventListener('change', renderSummary);
 
   const pays = [];
-  if (s.payment.cod) pays.push(['cod', 'الدفع عند الاستلام', 'كاش للمندوب وقت ما الأوردر يوصلك.']);
+  const dep = Z.codDeposit(s);
+  if (s.payment.cod) pays.push(['cod', 'الدفع عند الاستلام', dep ? 'بتحوّل مصاريف الشحن بس مقدّم على محفظة / إنستاباي علشان نأكد الأوردر، والباقي كاش للمندوب.' : 'كاش للمندوب وقت ما الأوردر يوصلك.']);
   if (s.payment.wallet) pays.push(['wallet', 'محفظة إلكترونية / إنستاباي', 'هتظهرلك بيانات التحويل بعد ما تأكد الطلب.']);
   $('pay-opts').innerHTML = pays.map(([v, t, d], i) => `<label class="pay"><input type="radio" name="payment" value="${v}" ${i ? '' : 'checked'}><span><b>${t}</b><small>${d}</small></span></label>`).join('');
+  $('pay-opts').addEventListener('change', renderSummary);
 
   // Restore saved details (per-device convenience only)
   const saved = Z.store.get('zikra_customer', null);
@@ -44,6 +46,7 @@ Z.boot('cart').then((cat) => {
       ${t.discount ? `<div class="sum-row good"><span>خصم ${esc(coupon.code)} (${coupon.percent}%)</span><span>−${Z.money(t.discount)}</span></div>` : ''}
       <div class="sum-row"><span>الشحن</span><span>${t.shipping === null ? 'اختار المحافظة' : Z.money(t.shipping)}</span></div>
       <div class="sum-row total"><span>الإجمالي</span><b>${t.shipping === null ? '—' : Z.money(t.total)}</b></div>
+      ${dep && form.payment && form.payment.value === 'cod' ? `<div class="deposit"><div class="sum-row"><span>مقدّم دلوقتي (مصاريف الشحن)</span><b>${t.shipping === null ? 'اختار المحافظة' : Z.money(t.shipping)}</b></div><div class="sum-row"><span>للمندوب عند الاستلام</span><b>${t.shipping === null ? '—' : Z.money(t.total - t.shipping)}</b></div><small>هتظهرلك بيانات التحويل بعد ما تأكد الطلب. بنجهّز الأوردر بعد ما نتأكد من تحويل الشحن.</small></div>` : ''}
       <button type="submit" class="btn btn-gold btn-block" id="submit">أكّد الطلب</button>
       <p class="policy-note">بتأكيد الطلب انت موافق على <a href="returns.html">سياسة الاستبدال والاسترجاع</a>. هنكلمك على واتساب نأكد الأوردر والعنوان.</p>
       ${t.gov && t.gov.days ? `<p class="policy-note">التوصيل لـ ${esc(t.gov.name)}: ${esc(t.gov.days)}.</p>` : t.gov ? `<p class="policy-note">هنأكدلك ميعاد التوصيل لـ ${esc(t.gov.name)} على واتساب.</p>` : ''}

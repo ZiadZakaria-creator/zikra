@@ -143,7 +143,7 @@ function viewOrders() {
     <div class="a-list">${list.length ? list.map((o) => `<div class="o-row"><button class="o-card" data-o="${esc(o.id)}">
       <div><div class="id"><bdi>${esc(o.id)}</bdi> ${priceIssues(o).length ? '<span class="warn-ic" title="فيه اختلاف في الأسعار">⚠</span>' : ''}</div><div class="meta">${fmtDate(o.createdAt)}</div></div>
       <div><div>${esc(o.customer?.name)}</div><div class="meta"><bdi dir="ltr">${esc(o.customer?.phone)}</bdi> · ${esc(o.address?.govName)}</div></div>
-      <div class="tot">${money(o.total)}<div class="meta">${o.payment === 'wallet' ? 'محفظة' : 'عند الاستلام'}</div></div>
+      <div class="tot">${money(o.total)}<div class="meta">${o.payment === 'wallet' ? 'محفظة' : depositOf(o) ? 'استلام · شحن مقدّم' : 'عند الاستلام'}</div></div>
       <span class="st st-${o.status}">${STATUS_L[o.status] || o.status}</span></button>
       <button class="o-del" data-del="${esc(o.id)}" aria-label="امسح الطلب ${esc(o.id)}" title="امسح الطلب نهائياً">${TRASH}</button></div>`).join('') : '<p class="empty">مفيش طلبات هنا.</p>'}</div>`;
   $('#q').oninput = (e) => { S.q = e.target.value; const pos = e.target.selectionStart; viewOrders(); const el = $('#q'); el.focus(); el.setSelectionRange(pos, pos); };
@@ -165,11 +165,13 @@ async function deleteOrder(id) {
   renderShell();
 }
 
+const depositOf = (o) => (o.payment !== 'wallet' && S.settings?.payment?.cod && S.settings.payment.codDeposit !== false ? o.shipping : 0);
+const payLabel = (o) => (o.payment === 'wallet' ? 'محفظة / إنستاباي' : depositOf(o) ? `عند الاستلام · الشحن ${money(o.shipping)} مقدّم` : 'الدفع عند الاستلام');
 function waTemplates(o) {
   const items = (o.items || []).map((i) => `- ${i.name} (${i.size} مل) × ${i.qty}`).join('\n');
   const addr = `${o.address.govName} - ${o.address.zoneName} - ${o.address.street}${o.address.landmark ? ' (' + o.address.landmark + ')' : ''}`;
   return [
-    ['تأكيد الأوردر', `أهلاً ${o.customer.name} 👋\nمعاك ذِكرى. استلمنا طلبك رقم ${o.id}:\n${items}\nالإجمالي ${money(o.total)} شامل الشحن (${o.payment === 'wallet' ? 'محفظة / إنستاباي' : 'الدفع عند الاستلام'}).\nنأكد الطلب؟`],
+    ['تأكيد الأوردر', `أهلاً ${o.customer.name} 👋\nمعاك ذِكرى. استلمنا طلبك رقم ${o.id}:\n${items}\nالإجمالي ${money(o.total)} شامل الشحن (${payLabel(o)}).${depositOf(o) ? `\nمن فضلك حوّل مصاريف الشحن ${money(o.shipping)} على ${S.settings.walletNumber || 'المحفظة'} وابعتلنا صورة التحويل، والباقي ${money(o.total - o.shipping)} للمندوب.` : ''}\nنأكد الطلب؟`],
     ['تأكيد العنوان + اللوكيشن', `ممكن تأكدلنا العنوان ده؟\n${addr}\nولو تقدر تبعتلنا اللوكيشن من واتساب (📎 ← الموقع) علشان المندوب يوصلك أسرع 🙏`],
     ['اتشحن', `طلبك ${o.id} اتشحن 🚚 وهيوصلك قريب إن شاء الله. لو عندك أي سؤال كلمنا هنا.`]
   ];
@@ -197,7 +199,8 @@ function openOrder(id) {
       ${o.discount ? `<div class="kv"><span>خصم ${esc(o.coupon)}</span><span>−${money(o.discount)}</span></div>` : ''}
       <div class="kv"><span>الشحن</span><span>${money(o.shipping)}</span></div>
       <div class="kv"><b>الإجمالي</b><b>${money(o.total)}</b></div>
-      <div class="kv"><span>الدفع</span><span>${o.payment === 'wallet' ? 'محفظة / إنستاباي' : 'عند الاستلام'}</span></div>
+      <div class="kv"><span>الدفع</span><span>${payLabel(o)}</span></div>
+      ${depositOf(o) ? `<div class="kv"><span>للمندوب يحصّل</span><b>${money(o.total - o.shipping)}</b></div>` : ''}
       <div class="kv"><span>المخزون</span><span>${o.stockApplied ? 'اتخصم' : 'لسه ماتخصمش (بيتخصم عند التأكيد)'}</span></div></div>
     <div class="box" style="margin-top:12px"><h3>الحالة</h3><div class="btn-row st-btns">${STATUS.map(([k, l]) => `<button data-st="${k}" class="${o.status === k ? 'on' : ''}">${l}</button>`).join('')}</div></div>
     <div class="box" style="margin-top:12px"><h3>رسايل واتساب جاهزة</h3><div class="btn-row">
@@ -250,7 +253,7 @@ async function changeStatus(o, to) {
 async function printInvoice(o) {
   const s = S.settings || {};
   const wa = (s.whatsapp || '').replace(/^20/, '0');
-  const pay = o.payment === 'wallet' ? 'محفظة / إنستاباي' : 'الدفع عند الاستلام';
+  const pay = payLabel(o);
   const d = o.createdAt?.toDate ? o.createdAt.toDate() : new Date();
   const testers = o.items.filter((i) => i.tester).reduce((n, i) => n + i.qty, 0);
   $('#invoice').innerHTML = `<div class="inv">
@@ -270,7 +273,7 @@ async function printInvoice(o) {
     <section class="inv-bottom">
       <div class="inv-pay"><h4>طريقة الدفع</h4><span class="inv-pill">${pay}</span>
         ${o.payment === 'wallet' && s.walletNumber ? `<div class="inv-muted">على رقم <span dir="ltr">${esc(s.walletNumber)}</span></div>` : ''}
-        ${o.payment !== 'wallet' ? `<div class="inv-muted">المطلوب من المندوب: <b>${money(o.total)}</b></div>` : ''}</div>
+        ${o.payment !== 'wallet' ? `<div class="inv-muted">المطلوب من المندوب: <b>${money(o.total - depositOf(o))}</b>${depositOf(o) ? ` <span>(الشحن ${money(o.shipping)} اتدفع مقدّم)</span>` : ''}</div>` : ''}</div>
       <div class="inv-totals">
         <div><span>المجموع</span><span>${money(o.subtotal)}</span></div>
         ${o.discount ? `<div><span>خصم ${esc(o.coupon)}</span><span>−${money(o.discount)}</span></div>` : ''}
@@ -651,6 +654,7 @@ async function viewSettings() {
       <div class="field"><label>Meta Pixel ID <span class="opt">(اختياري، أرقام بس)</span></label><input name="pixelId" dir="ltr" value="${esc(s.pixelId || '')}"></div>
       <div class="field"><label>Google Analytics ID <span class="opt">(اختياري، بيبدأ بـ G-)</span></label><input name="gaId" dir="ltr" value="${esc(s.gaId || '')}"></div></div>
       <label class="check"><input type="checkbox" name="cod" ${s.payment?.cod !== false ? 'checked' : ''}> الدفع عند الاستلام</label>
+      <label class="check"><input type="checkbox" name="codDeposit" ${s.payment?.codDeposit !== false ? 'checked' : ''}> مع الدفع عند الاستلام: العميل يحوّل مصاريف الشحن مقدّم</label>
       <label class="check"><input type="checkbox" name="wallet" ${s.payment?.wallet !== false ? 'checked' : ''}> محفظة / إنستاباي</label></div>
     <div class="box"><h3>مصاريف الشحن لكل محافظة</h3>
       <div class="btn-row"><button type="button" class="btn btn-line btn-sm" data-bulk="85">القاهرة والجيزة = ؟</button><small class="meta">غيّر الرقم جنب أي محافظة. المدة اختيارية (لو فاضية بنقول للعميل هنأكدها على واتساب).</small></div>
@@ -670,7 +674,7 @@ async function viewSettings() {
       ...s, whatsapp: wa ? '2' + wa : '', walletNumber: String(fd.get('walletNumber')).trim(), walletName: String(fd.get('walletName')).trim(),
       announcement: String(fd.get('announcement')).trim(), instagram: String(fd.get('instagram')).trim(), tiktok: String(fd.get('tiktok')).trim(),
       pixelId: String(fd.get('pixelId')).replace(/\D/g, ''), gaId: String(fd.get('gaId')).trim().toUpperCase(),
-      payment: { cod: !!fd.get('cod'), wallet: !!fd.get('wallet') }, governorates
+      payment: { cod: !!fd.get('cod'), codDeposit: !!fd.get('codDeposit'), wallet: !!fd.get('wallet') }, governorates
     });
     await guard(() => setDoc(doc(db, 'settings', 'store'), data), 'اتحفظت الإعدادات');
     S.settings = data;
