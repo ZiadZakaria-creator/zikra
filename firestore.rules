@@ -1,0 +1,85 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{db}/documents {
+
+    function isAdmin() {
+      return request.auth != null
+        && exists(/databases/$(db)/documents/admins/$(request.auth.uid));
+    }
+
+    // Admin accounts are created by hand in the console (admins/{uid}).
+    match /admins/{uid} {
+      allow read: if request.auth != null && request.auth.uid == uid;
+      allow write: if false;
+    }
+
+    // Catalog data is public: the deploy build reads it, the site itself reads catalog.json.
+    match /products/{id} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+    match /productImages/{id} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+    match /settings/{id} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+
+    // Visitors may look up one code; only admins can list or edit codes.
+    match /coupons/{code} {
+      allow get: if true;
+      allow list, write: if isAdmin();
+    }
+
+    match /orders/{id} {
+      allow read, update, delete: if isAdmin();
+      allow create: if validOrder(id, request.resource.data);
+    }
+
+    function str(v, min, max) { return v is string && v.size() >= min && v.size() <= max; }
+    function phone(v) { return v is string && v.matches('^01[0125][0-9]{8}$'); }
+
+    function validCustomer(c) {
+      return c is map
+        && c.keys().hasOnly(['name', 'phone', 'phone2']) && c.keys().hasAll(['name', 'phone', 'phone2'])
+        && str(c.name, 2, 60) && phone(c.phone) && (c.phone2 == '' || phone(c.phone2));
+    }
+
+    function validAddress(a) {
+      return a is map
+        && a.keys().hasOnly(['gov', 'govName', 'zone', 'zoneName', 'street', 'landmark'])
+        && a.keys().hasAll(['gov', 'govName', 'zone', 'zoneName', 'street', 'landmark'])
+        && str(a.gov, 2, 30) && str(a.govName, 2, 30) && str(a.zone, 0, 60)
+        && str(a.zoneName, 2, 60) && str(a.street, 5, 250) && str(a.landmark, 0, 100);
+    }
+
+    function couponOk(d) {
+      let c = get(/databases/$(db)/documents/coupons/$(d.coupon)).data;
+      return c.active == true && c.expiresAt > request.time
+        && d.discount == math.round(d.subtotal * c.percent / 100);
+    }
+
+    function validOrder(id, d) {
+      return id.matches('^ZK-[0-9]{6}-[A-HJ-NP-Z2-9]{4}$') && d.id == id
+        && d.keys().hasOnly(['id', 'createdAt', 'status', 'customer', 'address', 'items', 'subtotal',
+                             'shipping', 'discount', 'coupon', 'total', 'payment', 'notes'])
+        && d.keys().hasAll(['id', 'createdAt', 'status', 'customer', 'address', 'items', 'subtotal',
+                            'shipping', 'discount', 'coupon', 'total', 'payment', 'notes'])
+        && d.status == 'new'
+        && d.createdAt == request.time
+        && validCustomer(d.customer)
+        && validAddress(d.address)
+        && d.items is list && d.items.size() >= 1 && d.items.size() <= 20
+        && d.subtotal is number && d.subtotal > 0
+        && d.discount is number && d.discount >= 0 && d.discount <= d.subtotal
+        && d.shipping == get(/databases/$(db)/documents/settings/store).data.shippingFees[d.address.gov]
+        && d.total == d.subtotal - d.discount + d.shipping
+        && d.payment in ['cod', 'wallet']
+        && str(d.notes, 0, 300)
+        && d.coupon is string
+        && ((d.coupon == '' && d.discount == 0) || (d.coupon != '' && couponOk(d)));
+    }
+  }
+}

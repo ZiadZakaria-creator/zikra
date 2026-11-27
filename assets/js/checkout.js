@@ -47,7 +47,7 @@ Z.boot('cart').then((cat) => {
       <button type="submit" class="btn btn-gold btn-block" id="submit">أكّد الطلب</button>
       <p class="policy-note">بتأكيد الطلب انت موافق على <a href="returns.html">سياسة الاستبدال والاسترجاع</a>. هنكلمك على واتساب نأكد الأوردر والعنوان.</p>
       ${t.gov && t.gov.days ? `<p class="policy-note">التوصيل لـ ${esc(t.gov.name)}: ${esc(t.gov.days)}.</p>` : t.gov ? `<p class="policy-note">هنأكدلك ميعاد التوصيل لـ ${esc(t.gov.name)} على واتساب.</p>` : ''}
-      ${cat.demo ? '<p class="demo-note">وضع تجريبي: الطلب بيتحفظ على جهازك بس لحد ما نربط لوحة التحكم.</p>' : ''}
+      
     </div>`;
   }
 
@@ -55,7 +55,7 @@ Z.boot('cart').then((cat) => {
     if (!e.target.closest('#apply')) return;
     const err = $('coupon-err');
     if (coupon) { coupon = null; renderSummary(); return; }
-    const res = await Z.checkCoupon($('coupon').value, cat.demo);
+    const res = await Z.checkCoupon($('coupon').value);
     if (!res) return;
     if (!res.ok) { err.textContent = res.msg; return; }
     coupon = res; renderSummary();
@@ -96,7 +96,7 @@ Z.boot('cart').then((cat) => {
     const g = s.governorates.find((x) => x.id === gov.value);
     const order = {
       id: Z.orders.newId(),
-      createdAt: new Date().toISOString(),
+      createdAt: null,
       status: 'new',
       customer: { name: $('name').value.trim(), phone: Z.normPhone($('phone').value), phone2: $('phone2').value.trim() ? Z.normPhone($('phone2').value) : '' },
       address: { gov: g.id, govName: g.name, zone: '', zoneName: zone.value.trim(), street: $('street').value.trim(), landmark: $('landmark').value.trim() },
@@ -105,6 +105,7 @@ Z.boot('cart').then((cat) => {
       payment: form.payment.value, notes: $('notes').value.trim()
     };
     try {
+      order.createdAt = new Date().toISOString();
       await Z.orders.save(order);
       if ($('remember').checked) Z.store.set('zikra_customer', { name: order.customer.name, phone: order.customer.phone, phone2: order.customer.phone2, gov: g.id, zone: order.address.zoneName, street: order.address.street, landmark: order.address.landmark });
       else Z.store.set('zikra_customer', null);

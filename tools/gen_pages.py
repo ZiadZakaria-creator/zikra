@@ -23,6 +23,7 @@ HEAD = '''<!doctype html>
 {body}
 </main>
 <div id="site-footer"></div>
+<script src="firebase-config.js"></script>
 <script src="assets/js/app.js"></script>
 <script src="assets/js/{script}.js"></script>
 </body>

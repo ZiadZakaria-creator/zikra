@@ -12,7 +12,8 @@ Z.boot('cart').then((cat) => {
       <div class="order-id"><bdi>${esc(o.id)}</bdi><button class="chip" data-copy-id>انسخ</button></div></div>
     <div class="co-box">
       <h2>الخطوة الجاية</h2>
-      <p>ابعتلنا نسخة الطلب على واتساب علشان نأكده بسرعة. هنرد عليك نأكد العنوان وميعاد التوصيل.</p>
+      ${o.synced === false ? '<p class="demo-note"><b>طلبك ماوصلناش أونلاين.</b> لازم تبعته على واتساب من الزرار ده علشان نقدر نجهزه.</p>' : ''}
+      <p>${o.synced === false ? 'ابعت تفاصيل الطلب على واتساب، وهنرد عليك نأكد العنوان وميعاد التوصيل.' : 'استلمنا طلبك. ابعتلنا نسخة على واتساب لو حابب نأكده أسرع، وهنرد عليك نأكد العنوان وميعاد التوصيل.'}</p>
       ${hasWa ? `<a class="btn btn-wa btn-block" href="${Z.waLink(s, text)}" target="_blank" rel="noopener">ابعت الطلب على واتساب</a>`
         : '<p class="demo-note">رقم واتساب المتجر لسه ماتحطش، فالزرار مش شغال في النسخة التجريبية.</p>'}
       <button class="btn btn-line btn-block" data-copy-text style="margin-top:10px">انسخ تفاصيل الطلب</button>
