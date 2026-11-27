@@ -106,6 +106,39 @@
   .bnav a{display:flex;flex-direction:column;align-items:center;justify-content:center;font-size:11px;color:var(--muted);gap:2px}
   .bnav a.on{color:var(--ink);font-weight:600}
   .bnav svg{width:22px;height:22px;stroke:currentColor;fill:none;stroke-width:1.6}
+
+  /* Desktop / tablet layout */
+  .dnav{display:none}
+  @media (min-width:768px){
+    body{padding-bottom:0}
+    .bnav{display:none}
+    .wa{bottom:24px;left:24px}
+    .wrap{max-width:1200px;margin:0 auto;padding:0 32px}
+    header{padding:12px max(32px,calc((100% - 1200px)/2 + 32px))}
+    header .icon-btn[aria-label="القائمة"]{display:none}
+    .dnav{display:flex;gap:28px;font-size:14px;color:#cfc6b6}
+    .dnav a:hover{color:var(--gold)}
+    .hero{padding:64px 32px 72px}
+    .hero h1{font-size:52px}
+    .hero p{font-size:16px;max-width:460px}
+    .hero-logo{width:300px}
+    h2{font-size:28px}
+    .sec{padding:48px 0 8px}
+    .genders{gap:20px}
+    .g-card{aspect-ratio:4/3;padding:24px}
+    .g-card b{font-size:28px}
+    .g-art{width:26%}
+    .chips{margin:0;padding:0;flex-wrap:wrap}
+    .grid{grid-template-columns:repeat(4,1fr);gap:20px}
+    .banner-row{display:grid;grid-template-columns:1fr 1fr;gap:20px}
+    .banner-row .sec{padding-top:48px}
+    .banner{height:100%;padding:32px}
+    .banner .art{width:110px}
+    .facts{gap:20px}
+    .fact{padding:24px}
+    footer{padding:40px max(32px,calc((100% - 1200px)/2 + 32px))}
+    footer nav{grid-template-columns:repeat(3,max-content);column-gap:48px}
+  }
 </style>
 </head>
 <body>
@@ -128,6 +161,7 @@
 
 <header>
   <a class="icon-btn" aria-label="القائمة"><svg viewBox="0 0 24 24"><path d="M4 7h16M4 12h16M4 17h10"/></svg></a>
+  <nav class="dnav"><a>كل العطور</a><a>رجالي</a><a>حريمي</a><a>يونيسكس</a><a>الهدايا</a><a>اعرف ريحتك</a></nav>
   <a class="logo" href="#" aria-label="ذِكرى Zikra"><img src="../assets/brand/logo-mark-gold.webp" alt="ذِكرى" width="62" height="44"></a>
   <a class="icon-btn" aria-label="السلة"><svg viewBox="0 0 24 24"><path d="M6 8h12l-1 12H7L6 8z"/><path d="M9 8a3 3 0 0 1 6 0"/></svg><span class="badge">2</span></a>
 </header>
@@ -192,6 +226,7 @@
     </div>
   </section>
 
+  <div class="banner-row">
   <section class="sec">
     <div class="banner quiz">
       <div>
@@ -213,6 +248,7 @@
       <svg class="art" viewBox="0 0 100 140"><use href="#bottle"/></svg>
     </div>
   </section>
+  </div>
 
   <section class="sec">
     <div class="facts">
