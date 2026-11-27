@@ -230,7 +230,7 @@
       "variants": [
         {
           "size": 50,
-          "price": 650,
+          "price": 415,
           "stock": 5,
           "tester": true
         }
@@ -285,7 +285,7 @@
       "variants": [
         {
           "size": 50,
-          "price": 650,
+          "price": 415,
           "stock": 5,
           "tester": true
         }
@@ -338,7 +338,7 @@
       "variants": [
         {
           "size": 50,
-          "price": 650,
+          "price": 415,
           "stock": 5,
           "tester": true
         }
@@ -392,7 +392,7 @@
       "variants": [
         {
           "size": 50,
-          "price": 650,
+          "price": 425,
           "stock": 5,
           "tester": true
         }
@@ -445,8 +445,8 @@
       "variants": [
         {
           "size": 50,
-          "price": 650,
-          "stock": 0,
+          "price": 515,
+          "stock": 5,
           "tester": true
         }
       ],
@@ -497,7 +497,7 @@
       "variants": [
         {
           "size": 50,
-          "price": 650,
+          "price": 475,
           "stock": 5,
           "tester": true
         }
@@ -547,7 +547,7 @@
       "variants": [
         {
           "size": 50,
-          "price": 650,
+          "price": 635,
           "stock": 5,
           "tester": true
         }
