@@ -185,8 +185,8 @@
       "id": "p007",
       "slug": "007",
       "name": "007",
-      "line": "zikra",
-      "inspiredBy": "",
+      "line": "inspired",
+      "inspiredBy": "Le Male Elixir – Jean Paul Gaultier",
       "gender": "men",
       "families": [
         "woody",
@@ -241,8 +241,8 @@
       "id": "p-tre-lychee",
       "slug": "tre-lychee",
       "name": "Tre Lychee",
-      "line": "zikra",
-      "inspiredBy": "",
+      "line": "inspired",
+      "inspiredBy": "Delina – Parfums de Marly",
       "gender": "women",
       "families": [
         "fruity",
@@ -296,8 +296,8 @@
       "id": "p-2-wild",
       "slug": "2-wild",
       "name": "2 Wild",
-      "line": "zikra",
-      "inspiredBy": "",
+      "line": "inspired",
+      "inspiredBy": "Libre – YSL",
       "gender": "unisex",
       "families": [
         "oriental",
@@ -349,8 +349,8 @@
       "id": "p-sixy-thing",
       "slug": "sixy-thing",
       "name": "Sixy Thing",
-      "line": "zikra",
-      "inspiredBy": "",
+      "line": "inspired",
+      "inspiredBy": "Born in Roma Donna Intense – Valentino",
       "gender": "women",
       "families": [
         "oriental",
@@ -403,8 +403,8 @@
       "id": "p-mambo-no-05",
       "slug": "mambo-no-05",
       "name": "Mambo No.05",
-      "line": "zikra",
-      "inspiredBy": "",
+      "line": "inspired",
+      "inspiredBy": "No.05 – Rosendo Mateu",
       "gender": "unisex",
       "families": [
         "woody"
@@ -456,8 +456,8 @@
       "id": "p-oudsession",
       "slug": "oudsession-no-01",
       "name": "Oudsession No:01",
-      "line": "zikra",
-      "inspiredBy": "",
+      "line": "inspired",
+      "inspiredBy": "Oud Maracuja – Maison Crivelli",
       "gender": "unisex",
       "families": [
         "oud",
@@ -508,8 +508,8 @@
       "id": "p-four-loko",
       "slug": "four-loko",
       "name": "Four Loko",
-      "line": "zikra",
-      "inspiredBy": "",
+      "line": "inspired",
+      "inspiredBy": "Angels' Share Paradise – Kilian",
       "gender": "men",
       "families": [
         "oriental"

@@ -254,9 +254,8 @@ def sitemap_feed(products, settings):
     items = []
     for p in products:
         for v in p['variants']:
+            # Never put another house's brand in the Merchant feed: Google flags it as counterfeit.
             title = f'{p["name"]} {v["size"]}ml - ذِكرى'
-            if p.get('line') == 'inspired' and p.get('inspiredBy'):
-                title = f'{p["name"]} {v["size"]}ml (مستوحى من {p["inspiredBy"]})'
             items.append(f'''<item>
 <g:id>{esc(p["slug"])}-{v["size"]}</g:id><g:item_group_id>{esc(p["slug"])}</g:item_group_id>
 <title>{esc(title)}</title><description>{esc(p.get("description") or p["name"])}</description>
