@@ -10,7 +10,7 @@ Z.boot('shop').then((cat) => {
   if (!p) { root.innerHTML = '<p class="empty">العطر ده مش موجود. <a class="chip" href="shop.html">شوف كل العطور</a></p>'; return; }
 
   if (!document.body.dataset.slug) { // pre-rendered pages already carry SEO title/description
-    document.title = `${p.name} | ذِكرى`;
+    document.title = I18N.tr(`${p.name} | ذِكرى`);
     const md = document.querySelector('meta[name=description]');
     if (md) md.content = `${p.name}: ${p.description} ${L.gender[p.gender]}، ${Z.familyLine(p)}.`;
   }
@@ -19,7 +19,7 @@ Z.boot('shop').then((cat) => {
   let variant = p.variants.find((v) => v.stock > 0) || p.variants[0];
   const imgs = p.images.length ? p.images : [];
   const meter = (label, v) => `<div class="meter"><span>${label}</span><div class="track" role="meter" aria-valuemin="1" aria-valuemax="5" aria-valuenow="${v}" aria-label="${label}"><div class="fill" style="width:${v * 20}%"></div></div><em>${L.level[v]}</em></div>`;
-  const notes = (k, t) => p.notes[k] && p.notes[k].length ? `<div class="lvl"><b>${t}</b><span>${p.notes[k].map(esc).join('، ')}</span></div>` : '';
+  const notes = (k, t) => p.notes[k] && p.notes[k].length ? `<div class="lvl"><b>${t}</b><span>${I18N.notes(p.notes[k]).map(esc).join(I18N.lang === 'en' ? ', ' : '، ')}</span></div>` : '';
 
   root.innerHTML = `<div class="pdp">
     <div class="gallery">
@@ -30,7 +30,7 @@ Z.boot('shop').then((cat) => {
       <div class="line"><span class="pill">${esc(L.line[p.line] || '')}</span><span class="pill light">${L.gender[p.gender]}</span><span>${esc(Z.familyLine(p))}</span></div>
       <h1><bdi>${esc(p.name)}</bdi></h1>
       ${p.line === 'inspired' && p.inspiredBy ? `<p class="line">مستوحى من: ${esc(p.inspiredBy)}. ده مش العطر الأصلي.</p>` : ''}
-      <p style="margin-top:8px">${esc(p.description)}</p>
+      <p style="margin-top:8px" dir="auto">${esc(I18N.pick(p, 'description'))}</p>
       <div class="big-price" id="price"></div>
       <div class="size-opts" role="radiogroup" aria-label="الحجم">${p.variants.map((v) => `<button role="radio" data-size="${v.size}" ${v.stock > 0 ? '' : 'disabled'}>${v.size} مل</button>`).join('')}</div>
       <div class="stock" id="stock"></div>
@@ -45,7 +45,7 @@ Z.boot('shop').then((cat) => {
       <div class="info-block"><h2>الثبات والفوحان</h2>${meter('الثبات', p.longevity)}${meter('الفوحان', p.sillage)}</div>
       <div class="info-block"><h2>يناسب إمتى؟</h2>
         <div class="tags">${p.seasons.map((x) => `<span class="pill light">${L.season[x]}</span>`).join('')}${(p.times || []).map((x) => `<span class="pill light">${L.time[x]}</span>`).join('')}${p.occasions.map((x) => `<span class="pill light">${L.occasion[x]}</span>`).join('')}</div>
-        ${p.likeIf ? `<p style="margin-top:12px"><b>هيعجبك:</b> ${esc(p.likeIf)}</p>` : ''}
+        ${p.likeIf ? `<p style="margin-top:12px"><b>هيعجبك:</b> ${esc(I18N.pick(p, 'likeIf'))}</p>` : ''}
       </div>
     </div>
   </div>

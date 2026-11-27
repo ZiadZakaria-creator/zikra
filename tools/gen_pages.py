@@ -10,6 +10,7 @@ HEAD = '''<!doctype html>
 <title>{title}</title>
 <meta name="description" content="{desc}">
 <meta name="theme-color" content="#0f0e0c">
+<script>(function(){{try{{var d=document.documentElement,l=localStorage.getItem('zikra_lang'),t=localStorage.getItem('zikra_theme');if(t==='dark')d.dataset.theme='dark';if(l==='en'){{d.lang='en';d.dir='ltr';}}}}catch(e){{}}}})();</script>
 <link rel="icon" type="image/png" sizes="32x32" href="assets/brand/favicon-32.png">
 <link rel="apple-touch-icon" href="assets/brand/apple-touch-icon.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -26,6 +27,7 @@ HEAD = '''<!doctype html>
 </main>
 <div id="site-footer"></div>
 <script src="firebase-config.js"></script>
+<script src="assets/js/i18n.js"></script>
 <script src="assets/js/app.js"></script>
 <script src="assets/js/{script}.js"></script>
 </body>

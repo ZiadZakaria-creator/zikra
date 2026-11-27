@@ -432,6 +432,8 @@ function openProduct(id) {
       <div class="grid2"><div class="field"><label>الموسم</label>${chk('seasons', L.season, p.seasons)}</div><div class="field"><label>الوقت</label>${chk('times', L.time, p.times || [])}</div></div>
       <div class="field"><label>الوصف</label><textarea name="description" rows="2" maxlength="300">${esc(p.description)}</textarea></div>
       <div class="field"><label>"هيعجبك لو…"</label><input name="likeIf" value="${esc(p.likeIf)}" maxlength="150"></div>
+      <div class="grid2"><div class="field"><label>الوصف بالإنجليزي <span class="opt">(اختياري، للنسخة الإنجليزي)</span></label><textarea name="descriptionEn" rows="2" maxlength="300" dir="ltr">${esc(p.descriptionEn || '')}</textarea></div>
+        <div class="field"><label>"هيعجبك لو" بالإنجليزي <span class="opt">(اختياري)</span></label><input name="likeIfEn" value="${esc(p.likeIfEn || '')}" maxlength="150" dir="ltr"></div></div>
       <div class="grid2"><div class="field"><label>المقدمة (افصل بفاصلة)</label><input name="top" value="${esc((p.notes?.top || []).join('، '))}"></div>
         <div class="field"><label>القلب</label><input name="heart" value="${esc((p.notes?.heart || []).join('، '))}"></div>
         <div class="field"><label>القاعدة</label><input name="base" value="${esc((p.notes?.base || []).join('، '))}"></div>
@@ -458,6 +460,7 @@ function openProduct(id) {
       name: fd.get('name').trim(), slug: slugify(fd.get('slug') || fd.get('name')), line: fd.get('line'), inspiredBy: (fd.get('inspiredBy') || '').trim(),
       gender: fd.get('gender'), families: list('families'), occasions: list('occasions'), seasons: list('seasons'), times: list('times'),
       description: fd.get('description').trim(), likeIf: fd.get('likeIf').trim(),
+      descriptionEn: String(fd.get('descriptionEn') || '').trim(), likeIfEn: String(fd.get('likeIfEn') || '').trim(),
       notes: { top: split(fd.get('top')), heart: split(fd.get('heart')), base: split(fd.get('base')) },
       longevity: Math.min(5, Math.max(1, Number(fd.get('longevity')) || 3)), sillage: Math.min(5, Math.max(1, Number(fd.get('sillage')) || 3)),
       active: !!fd.get('active'), nonReturnable: !!fd.get('nonReturnable')
