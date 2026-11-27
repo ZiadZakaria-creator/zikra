@@ -56,10 +56,10 @@ h2{font-size:26px;font-weight:600}
 .drawer .panel .close{align-self:flex-start}
 
 /* Hero */
-.hero{position:relative;min-height:640px;display:flex;align-items:flex-end;color:var(--cream);background:var(--ink);overflow:hidden}
-.hero picture,.hero .hero-img{position:absolute;inset:0}
-.hero .hero-img img{width:100%;height:100%;object-fit:cover;object-position:center 20%}
-.hero::after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,rgba(15,14,12,.15) 0%,rgba(15,14,12,0) 35%,rgba(15,14,12,.88) 62%,var(--ink) 100%)}
+.hero{position:relative;min-height:680px;display:flex;align-items:flex-end;color:var(--cream);background:var(--ink);overflow:hidden}
+.hero picture,.hero .hero-img{position:absolute;inset:0 0 28% 0}
+.hero .hero-img img{width:100%;height:100%;object-fit:cover;object-position:center 30%}
+.hero::after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,rgba(15,14,12,.1) 0%,rgba(15,14,12,0) 30%,rgba(15,14,12,.85) 58%,var(--ink) 72%)}
 .hero .content{position:relative;z-index:1;width:100%;text-align:center;padding:0 var(--pad) 40px}
 .hero .tagline{display:flex;align-items:center;justify-content:center;gap:10px;font-family:var(--latin);color:var(--gold-2);font-size:16px;letter-spacing:.04em}
 .hero .tagline::before,.hero .tagline::after{content:"";width:28px;height:1px;background:var(--gold)}
@@ -213,7 +213,7 @@ body:has(.sticky-buy) .wa-fab{bottom:142px}
 
 /* Product page */
 .pdp{display:grid;gap:24px;padding-top:4px}
-.gallery .main{aspect-ratio:1;border-radius:var(--r-lg);overflow:hidden;background:#f7f2ea;border:1px solid var(--line)}
+.gallery .main{aspect-ratio:4/5;border-radius:var(--r-lg);overflow:hidden;background:#f7f2ea;border:1px solid var(--line)}
 .gallery .main img{width:100%;height:100%;object-fit:cover}
 .gallery .thumbs{display:flex;gap:8px;margin-top:10px}
 .gallery .thumbs button{width:64px;height:64px;border-radius:12px;overflow:hidden;border:2px solid transparent}
@@ -285,7 +285,7 @@ details.faq p{margin-top:8px;color:var(--muted)}
   h2{font-size:34px}
   .sec{padding:72px 0 4px}
   .hero{min-height:720px;align-items:stretch}
-  .hero .hero-img{left:0;right:auto;width:50%}
+  .hero .hero-img{inset:0 auto 0 0;width:50%}
   .hero::after{background:linear-gradient(270deg,var(--ink) 50%,rgba(15,14,12,.9) 54%,rgba(15,14,12,0) 70%)}
   .hero .content{display:flex;flex-direction:column;justify-content:center;align-items:flex-start;text-align:right;max-width:var(--wrap);margin:0 auto;padding:0 var(--pad)}
   .hero .content>*{max-width:520px}
