@@ -6,127 +6,178 @@
     "whatsapp": "",
     "walletNumber": "01599573883",
     "deliveryDays": "3 أيام عمل",
-    "areas": "القاهرة والجيزة",
+    "areas": "كل محافظات مصر",
     "instagram": "",
     "tiktok": "",
     "governorates": [
       {
         "id": "cairo",
-        "name": "القاهرة"
+        "name": "القاهرة",
+        "fee": 85,
+        "days": "3 أيام عمل"
       },
       {
         "id": "giza",
-        "name": "الجيزة"
-      }
-    ],
-    "shippingZones": [
-      {
-        "id": "nasr-city",
-        "gov": "cairo",
-        "name": "مدينة نصر",
-        "fee": 60
+        "name": "الجيزة",
+        "fee": 85,
+        "days": "3 أيام عمل"
       },
       {
-        "id": "heliopolis",
-        "gov": "cairo",
-        "name": "مصر الجديدة",
-        "fee": 60
+        "id": "alex",
+        "name": "الإسكندرية",
+        "fee": 120,
+        "days": ""
       },
       {
-        "id": "downtown",
-        "gov": "cairo",
-        "name": "وسط البلد",
-        "fee": 55
+        "id": "qalyubia",
+        "name": "القليوبية",
+        "fee": 120,
+        "days": ""
       },
       {
-        "id": "maadi",
-        "gov": "cairo",
-        "name": "المعادي",
-        "fee": 65
+        "id": "sharqia",
+        "name": "الشرقية",
+        "fee": 120,
+        "days": ""
       },
       {
-        "id": "new-cairo",
-        "gov": "cairo",
-        "name": "التجمع الخامس",
-        "fee": 75
+        "id": "dakahlia",
+        "name": "الدقهلية",
+        "fee": 120,
+        "days": ""
       },
       {
-        "id": "shorouk",
-        "gov": "cairo",
-        "name": "الشروق",
-        "fee": 85
+        "id": "gharbia",
+        "name": "الغربية",
+        "fee": 120,
+        "days": ""
       },
       {
-        "id": "madinaty",
-        "gov": "cairo",
-        "name": "مدينتي",
-        "fee": 85
+        "id": "monufia",
+        "name": "المنوفية",
+        "fee": 120,
+        "days": ""
       },
       {
-        "id": "obour",
-        "gov": "cairo",
-        "name": "العبور",
-        "fee": 85
+        "id": "beheira",
+        "name": "البحيرة",
+        "fee": 120,
+        "days": ""
       },
       {
-        "id": "shubra",
-        "gov": "cairo",
-        "name": "شبرا",
-        "fee": 55
+        "id": "kafr-elsheikh",
+        "name": "كفر الشيخ",
+        "fee": 120,
+        "days": ""
       },
       {
-        "id": "helwan",
-        "gov": "cairo",
-        "name": "حلوان",
-        "fee": 75
+        "id": "damietta",
+        "name": "دمياط",
+        "fee": 120,
+        "days": ""
       },
       {
-        "id": "dokki",
-        "gov": "giza",
-        "name": "الدقي",
-        "fee": 55
+        "id": "port-said",
+        "name": "بورسعيد",
+        "fee": 120,
+        "days": ""
       },
       {
-        "id": "mohandessin",
-        "gov": "giza",
-        "name": "المهندسين",
-        "fee": 55
+        "id": "ismailia",
+        "name": "الإسماعيلية",
+        "fee": 120,
+        "days": ""
       },
       {
-        "id": "haram",
-        "gov": "giza",
-        "name": "الهرم",
-        "fee": 60
+        "id": "suez",
+        "name": "السويس",
+        "fee": 120,
+        "days": ""
       },
       {
-        "id": "faisal",
-        "gov": "giza",
-        "name": "فيصل",
-        "fee": 60
+        "id": "fayoum",
+        "name": "الفيوم",
+        "fee": 120,
+        "days": ""
       },
       {
-        "id": "october",
-        "gov": "giza",
-        "name": "6 أكتوبر",
-        "fee": 80
+        "id": "beni-suef",
+        "name": "بني سويف",
+        "fee": 120,
+        "days": ""
       },
       {
-        "id": "zayed",
-        "gov": "giza",
-        "name": "الشيخ زايد",
-        "fee": 80
+        "id": "minya",
+        "name": "المنيا",
+        "fee": 120,
+        "days": ""
       },
       {
-        "id": "hadayek-ahram",
-        "gov": "giza",
-        "name": "حدائق الأهرام",
-        "fee": 70
+        "id": "assiut",
+        "name": "أسيوط",
+        "fee": 120,
+        "days": ""
+      },
+      {
+        "id": "sohag",
+        "name": "سوهاج",
+        "fee": 120,
+        "days": ""
+      },
+      {
+        "id": "qena",
+        "name": "قنا",
+        "fee": 200,
+        "days": ""
+      },
+      {
+        "id": "luxor",
+        "name": "الأقصر",
+        "fee": 200,
+        "days": ""
+      },
+      {
+        "id": "aswan",
+        "name": "أسوان",
+        "fee": 200,
+        "days": ""
+      },
+      {
+        "id": "red-sea",
+        "name": "البحر الأحمر",
+        "fee": 200,
+        "days": ""
+      },
+      {
+        "id": "new-valley",
+        "name": "الوادي الجديد",
+        "fee": 200,
+        "days": ""
+      },
+      {
+        "id": "matrouh",
+        "name": "مطروح",
+        "fee": 200,
+        "days": ""
+      },
+      {
+        "id": "north-sinai",
+        "name": "شمال سيناء",
+        "fee": 200,
+        "days": ""
+      },
+      {
+        "id": "south-sinai",
+        "name": "جنوب سيناء",
+        "fee": 200,
+        "days": ""
       }
     ],
     "payment": {
       "cod": true,
       "wallet": true
-    }
+    },
+    "announcement": "توصيل لكل محافظات مصر · الدفع عند الاستلام"
   },
   "products": [
     {

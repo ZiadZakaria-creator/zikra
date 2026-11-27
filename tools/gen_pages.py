@@ -35,8 +35,8 @@ def page(name, title, desc, body, script):
 FAMILIES = [('oud','عود','OUD'),('floral','ورد','ROSE'),('fruity','فواكه','FRUITY'),('oriental','شرقي','ORIENTAL'),('fresh','فريش','FRESH'),('woody','خشبي','WOODY')]
 fam_html = ''.join(f'<a class="fam" href="shop.html?family={k}"><div class="sw sw-{k}"></div><b>{a}</b><small>{e}</small></a>' for k,a,e in reversed(FAMILIES))
 
-page('index.html', 'ذِكرى | عطور أونلاين في القاهرة والجيزة',
- 'متجر ذِكرى للعطور: رجالي وحريمي ويونيسكس، توصيل القاهرة والجيزة خلال 3 أيام عمل والدفع عند الاستلام.', f'''
+page('index.html', 'ذِكرى | عطور أونلاين بتوصيل لكل مصر',
+ 'متجر ذِكرى للعطور: رجالي وحريمي ويونيسكس، توصيل لكل محافظات مصر والدفع عند الاستلام.', f'''
 <section class="hero">
   <div class="hero-img"><img src="assets/img/products/mambo-no-05-3.webp" alt="" fetchpriority="high" width="1121" height="1403"></div>
   <div class="content">
@@ -44,7 +44,7 @@ page('index.html', 'ذِكرى | عطور أونلاين في القاهرة و�
     <h1>ريحة <em>تفضل</em><br>في الذاكرة</h1>
     <p>اختار عطرك حسب ذوقك والمناسبة والميزانية، وإحنا نوصلهولك لحد البيت.</p>
     <div class="ctas"><a class="btn btn-gold" href="shop.html">تسوّق العطور</a><a class="btn btn-ghost" href="quiz.html">اعرف ريحتك</a></div>
-    <div class="facts"><div><b>3 أيام عمل</b><span>توصيل القاهرة والجيزة</span></div><div><b>عند الاستلام</b><span>أو محفظة / إنستاباي</span></div><div><b>واتساب</b><span>نرد على أسئلتك</span></div></div>
+    <div class="facts"><div><b>لكل مصر</b><span>توصيل لكل المحافظات</span></div><div><b>عند الاستلام</b><span>أو محفظة / إنستاباي</span></div><div><b>واتساب</b><span>نرد على أسئلتك</span></div></div>
   </div>
 </section>
 
@@ -90,7 +90,7 @@ page('index.html', 'ذِكرى | عطور أونلاين في القاهرة و�
 </div></div></section>
 
 <section class="sec"><div class="wrap facts-row">
-  <div class="fact"><svg class="icon" viewBox="0 0 24 24"><path d="M3 7h11v9H3zM14 10h4l3 3v3h-7z"/><circle cx="7" cy="17" r="1.6"/><circle cx="17" cy="17" r="1.6"/></svg><div><b>3 أيام عمل</b><span>القاهرة والجيزة</span></div></div>
+  <div class="fact"><svg class="icon" viewBox="0 0 24 24"><path d="M3 7h11v9H3zM14 10h4l3 3v3h-7z"/><circle cx="7" cy="17" r="1.6"/><circle cx="17" cy="17" r="1.6"/></svg><div><b>لكل مصر</b><span>توصيل لكل المحافظات</span></div></div>
   <div class="fact"><svg class="icon" viewBox="0 0 24 24"><rect x="3" y="6" width="18" height="12" rx="2"/><circle cx="12" cy="12" r="2.5"/></svg><div><b>عند الاستلام</b><span>أو محفظة / إنستاباي</span></div></div>
   <div class="fact"><svg class="icon" viewBox="0 0 24 24"><path d="M4 20l1.5-4A8 8 0 1 1 8 18.5z"/></svg><div><b>واتساب</b><span>نرد على أسئلتك</span></div></div>
 </div></section>
@@ -146,13 +146,13 @@ def prose(name, title, desc, eyebrow, h1, sub, inner):
 prose('about.html','عننا','عن متجر ذِكرى للعطور.','About','عننا','حكاية ذِكرى.','''
 <p class="todo">[نص مطلوب من صاحب المتجر] إمتى بدأت ذِكرى، وليه اخترت العطور، وإيه اللي يميّزكم. مش هنكتب قصة من عندنا.</p>
 <h2>اللي بنقدمه</h2>
-<ul><li>عطور رجالي وحريمي ويونيسكس.</li><li>كل زجاجة 50 مل معاها تستر 3 مل من نفس الريحة.</li><li>توصيل القاهرة والجيزة خلال 3 أيام عمل.</li><li>الدفع عند الاستلام، أو محفظة إلكترونية / إنستاباي.</li></ul>
+<ul><li>عطور رجالي وحريمي ويونيسكس.</li><li>كل زجاجة 50 مل معاها تستر 3 مل من نفس الريحة.</li><li>توصيل لكل محافظات مصر، والقاهرة والجيزة خلال 3 أيام عمل.</li><li>الدفع عند الاستلام، أو محفظة إلكترونية / إنستاباي.</li></ul>
 ''')
 
-prose('shipping.html','الشحن','مناطق ومواعيد ومصاريف الشحن في ذِكرى.','Shipping','الشحن والتوصيل','القاهرة والجيزة بس.','''
-<h2>بنوصل فين؟</h2><p>القاهرة والجيزة بس حالياً.</p>
-<h2>التوصيل بياخد قد إيه؟</h2><p>3 أيام عمل من تأكيد الأوردر.</p>
-<h2>مصاريف الشحن</h2><p>بتتحسب حسب منطقتك، وبتظهرلك قبل ما تأكد الطلب.</p>
+prose('shipping.html','الشحن','مصاريف ومواعيد الشحن لكل محافظات مصر في ذِكرى.','Shipping','الشحن والتوصيل','بنوصل لكل محافظات مصر.','''
+<h2>بنوصل فين؟</h2><p>لكل محافظات مصر.</p>
+<h2>التوصيل بياخد قد إيه؟</h2><p>القاهرة والجيزة: 3 أيام عمل من تأكيد الأوردر. باقي المحافظات: هنأكدلك الميعاد على واتساب وقت تأكيد الطلب.</p>
+<h2>مصاريف الشحن</h2><p>بتتحسب حسب محافظتك، وبتظهرلك قبل ما تأكد الطلب.</p>
 <div id="ship-table"></div>
 <h2>الدفع</h2><p>الدفع عند الاستلام، أو تحويل على محفظة إلكترونية / إنستاباي.</p>
 <h2>تأكيد الأوردر</h2><p>بعد ما تطلب، هنكلمك على واتساب نأكد الطلب والعنوان.</p>
@@ -172,7 +172,8 @@ prose('returns.html','الاستبدال والاسترجاع','سياسة ال�
 ''')
 
 prose('faq.html','الأسئلة الشائعة','أسئلة شائعة عن الطلب والشحن والدفع والاسترجاع في ذِكرى.','FAQ','الأسئلة الشائعة','لو سؤالك مش هنا، كلمنا على واتساب.','''
-<details class="faq"><summary>بتوصلوا فين؟</summary><p>القاهرة والجيزة بس، خلال 3 أيام عمل.</p></details>
+<details class="faq"><summary>بتوصلوا فين؟</summary><p>لكل محافظات مصر. القاهرة والجيزة خلال 3 أيام عمل، وباقي المحافظات بنأكد الميعاد على واتساب.</p></details>
+<details class="faq"><summary>الشحن بكام؟</summary><p>حسب المحافظة، والسعر بيظهرلك في صفحة تأكيد الطلب قبل ما تأكد. التفاصيل في <a href="shipping.html">صفحة الشحن</a>.</p></details>
 <details class="faq"><summary>إزاي أدفع؟</summary><p>الدفع عند الاستلام، أو تحويل على محفظة إلكترونية / إنستاباي.</p></details>
 <details class="faq"><summary>محتاج أعمل حساب علشان أطلب؟</summary><p>لأ. بتكتب اسمك وتليفونك وعنوانك بس.</p></details>
 <details class="faq"><summary>إيه هو التستر 3 مل؟</summary><p>زجاجة صغيرة من نفس الريحة بتيجي مجاناً مع كل 50 مل، علشان تجرّب قبل ما تفتح الزجاجة الكبيرة.</p></details>
@@ -209,7 +210,7 @@ page_noindex('checkout.html', 'تأكيد الطلب | ذِكرى', '''
     <fieldset class="co-box"><legend>العنوان</legend>
       <div class="field-row">
         <div class="field"><label for="gov">المحافظة</label><select id="gov" name="gov" required></select><small class="err"></small></div>
-        <div class="field"><label for="zone">المنطقة</label><select id="zone" name="zone" required><option value="">اختار المحافظة الأول</option></select><small class="err"></small></div>
+        <div class="field"><label for="zone">المنطقة / المدينة</label><input id="zone" name="zone" required maxlength="60" placeholder="مثلاً: مدينة نصر"><small class="err"></small></div>
       </div>
       <div class="field"><label for="street">العنوان بالتفصيل</label><textarea id="street" name="street" rows="2" required maxlength="250" placeholder="الشارع، رقم العمارة، الدور، الشقة"></textarea><small class="err"></small></div>
       <div class="field"><label for="landmark">علامة مميزة <span class="opt">(اختياري)</span></label><input id="landmark" name="landmark" maxlength="100"></div>

@@ -1,6 +1,6 @@
 # Zikra (ذِكرى)
 
-Online perfume store for Cairo & Giza. Static site (HTML/CSS/vanilla JS) + Firebase (phase C).
+Online perfume store in Egypt (nationwide delivery). Static site (HTML/CSS/vanilla JS) + Firebase (phase C).
 
 ## Run locally
 ```bash

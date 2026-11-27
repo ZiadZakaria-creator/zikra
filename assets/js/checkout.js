@@ -7,13 +7,9 @@ Z.boot('cart').then((cat) => {
 
   const $ = (id) => document.getElementById(id);
   const gov = $('gov'), zone = $('zone');
-  gov.innerHTML = '<option value="">اختار</option>' + s.governorates.map((g) => `<option value="${g.id}">${esc(g.name)}</option>`).join('');
-  function fillZones() {
-    const list = s.shippingZones.filter((z) => z.gov === gov.value);
-    zone.innerHTML = list.length ? '<option value="">اختار المنطقة</option>' + list.map((z) => `<option value="${z.id}">${esc(z.name)} (${Z.money(z.fee)})</option>`).join('') : '<option value="">اختار المحافظة الأول</option>';
-  }
-  gov.addEventListener('change', () => { fillZones(); renderSummary(); });
-  zone.addEventListener('change', renderSummary);
+  // Shipping is priced per governorate; the area is free text
+  gov.innerHTML = '<option value="">اختار المحافظة</option>' + s.governorates.map((g) => `<option value="${g.id}">${esc(g.name)} (شحن ${Z.money(g.fee)})</option>`).join('');
+  gov.addEventListener('change', renderSummary);
 
   const pays = [];
   if (s.payment.cod) pays.push(['cod', 'الدفع عند الاستلام', 'كاش للمندوب وقت ما الأوردر يوصلك.']);
@@ -24,16 +20,17 @@ Z.boot('cart').then((cat) => {
   const saved = Z.store.get('zikra_customer', null);
   if (saved) {
     ['name', 'phone', 'phone2', 'street', 'landmark'].forEach((k) => { if (saved[k]) $(k).value = saved[k]; });
-    if (saved.gov) { gov.value = saved.gov; fillZones(); if (saved.zone) zone.value = saved.zone; }
+    if (saved.gov) gov.value = saved.gov;
+    if (saved.zone) zone.value = saved.zone;
   }
 
   let coupon = null;
   function totals() {
     const subtotal = lines.reduce((n, l) => n + l.total, 0);
-    const z = s.shippingZones.find((x) => x.id === zone.value);
-    const shipping = z ? z.fee : null;
+    const g = s.governorates.find((x) => x.id === gov.value);
+    const shipping = g ? g.fee : null;
     const discount = coupon ? Math.round(subtotal * coupon.percent / 100) : 0;
-    return { subtotal, shipping, discount, total: subtotal - discount + (shipping || 0), zone: z };
+    return { subtotal, shipping, discount, total: subtotal - discount + (shipping || 0), gov: g };
   }
 
   function renderSummary() {
@@ -45,10 +42,11 @@ Z.boot('cart').then((cat) => {
       <small class="err" id="coupon-err"></small>
       <div class="sum-row"><span>المجموع</span><span>${Z.money(t.subtotal)}</span></div>
       ${t.discount ? `<div class="sum-row good"><span>خصم ${esc(coupon.code)} (${coupon.percent}%)</span><span>−${Z.money(t.discount)}</span></div>` : ''}
-      <div class="sum-row"><span>الشحن</span><span>${t.shipping === null ? 'اختار المنطقة' : Z.money(t.shipping)}</span></div>
+      <div class="sum-row"><span>الشحن</span><span>${t.shipping === null ? 'اختار المحافظة' : Z.money(t.shipping)}</span></div>
       <div class="sum-row total"><span>الإجمالي</span><b>${t.shipping === null ? '—' : Z.money(t.total)}</b></div>
       <button type="submit" class="btn btn-gold btn-block" id="submit">أكّد الطلب</button>
       <p class="policy-note">بتأكيد الطلب انت موافق على <a href="returns.html">سياسة الاستبدال والاسترجاع</a>. هنكلمك على واتساب نأكد الأوردر والعنوان.</p>
+      ${t.gov && t.gov.days ? `<p class="policy-note">التوصيل لـ ${esc(t.gov.name)}: ${esc(t.gov.days)}.</p>` : t.gov ? `<p class="policy-note">هنأكدلك ميعاد التوصيل لـ ${esc(t.gov.name)} على واتساب.</p>` : ''}
       ${cat.demo ? '<p class="demo-note">وضع تجريبي: الطلب بيتحفظ على جهازك بس لحد ما نربط لوحة التحكم.</p>' : ''}
     </div>`;
   }
@@ -73,7 +71,7 @@ Z.boot('cart').then((cat) => {
       phone: !Z.validPhone($('phone').value) ? 'رقم موبايل مصري من 11 رقم يبدأ بـ 01' : '',
       phone2: $('phone2').value.trim() && !Z.validPhone($('phone2').value) ? 'الرقم ده مش صحيح' : '',
       gov: !gov.value ? 'اختار المحافظة' : '',
-      zone: !zone.value ? 'اختار المنطقة' : '',
+      zone: zone.value.trim().length < 2 ? 'اكتب المنطقة أو المدينة' : '',
       street: $('street').value.trim().length < 8 ? 'اكتب العنوان بالتفصيل' : ''
     };
     Object.entries(errs).forEach(([k, v]) => setErr(k, v));
@@ -101,14 +99,14 @@ Z.boot('cart').then((cat) => {
       createdAt: new Date().toISOString(),
       status: 'new',
       customer: { name: $('name').value.trim(), phone: Z.normPhone($('phone').value), phone2: $('phone2').value.trim() ? Z.normPhone($('phone2').value) : '' },
-      address: { gov: g.id, govName: g.name, zone: t.zone.id, zoneName: t.zone.name, street: $('street').value.trim(), landmark: $('landmark').value.trim() },
+      address: { gov: g.id, govName: g.name, zone: '', zoneName: zone.value.trim(), street: $('street').value.trim(), landmark: $('landmark').value.trim() },
       items: lines.map((l) => ({ id: l.p.id, name: l.p.name, size: l.v.size, price: l.v.price, qty: l.qty, total: l.total, tester: !!l.v.tester })),
       subtotal: t.subtotal, shipping: t.shipping, discount: t.discount, coupon: coupon ? coupon.code : '', total: t.total,
       payment: form.payment.value, notes: $('notes').value.trim()
     };
     try {
       await Z.orders.save(order);
-      if ($('remember').checked) Z.store.set('zikra_customer', { name: order.customer.name, phone: order.customer.phone, phone2: order.customer.phone2, gov: g.id, zone: t.zone.id, street: order.address.street, landmark: order.address.landmark });
+      if ($('remember').checked) Z.store.set('zikra_customer', { name: order.customer.name, phone: order.customer.phone, phone2: order.customer.phone2, gov: g.id, zone: order.address.zoneName, street: order.address.street, landmark: order.address.landmark });
       else Z.store.set('zikra_customer', null);
       Z.cart.clear();
       location.href = 'order.html?id=' + encodeURIComponent(order.id);

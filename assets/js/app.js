@@ -197,7 +197,7 @@
     const header = document.getElementById('site-header');
     if (header) {
       header.outerHTML = `${demo ? '<div class="demo-bar">نسخة تجريبية: الأسعار والمخزون والمكونات للعرض بس لحد ما تتظبط من لوحة التحكم.</div>' : ''}
-      <div class="announce">توصيل ${esc(settings.areas)} خلال ${esc(settings.deliveryDays)} · الدفع عند الاستلام</div>
+      <div class="announce">${esc(settings.announcement || ('توصيل ' + settings.areas + ' · الدفع عند الاستلام'))}</div>
       <header class="site-header"><div class="wrap bar">
         <button class="icon-btn menu-btn" data-open-menu aria-label="القائمة">${I.menu}</button>
         <nav class="main-nav" aria-label="الرئيسية">${NAV.map(([h, l, k]) => `<a href="${h}" class="${k === active ? 'on' : ''}">${l}</a>`).join('')}</nav>

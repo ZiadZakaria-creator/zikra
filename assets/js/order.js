@@ -12,7 +12,7 @@ Z.boot('cart').then((cat) => {
       <div class="order-id"><bdi>${esc(o.id)}</bdi><button class="chip" data-copy-id>انسخ</button></div></div>
     <div class="co-box">
       <h2>الخطوة الجاية</h2>
-      <p>ابعتلنا نسخة الطلب على واتساب علشان نأكده بسرعة. هنرد عليك نأكد العنوان وميعاد التوصيل (${esc(s.deliveryDays)}).</p>
+      <p>ابعتلنا نسخة الطلب على واتساب علشان نأكده بسرعة. هنرد عليك نأكد العنوان وميعاد التوصيل.</p>
       ${hasWa ? `<a class="btn btn-wa btn-block" href="${Z.waLink(s, text)}" target="_blank" rel="noopener">ابعت الطلب على واتساب</a>`
         : '<p class="demo-note">رقم واتساب المتجر لسه ماتحطش، فالزرار مش شغال في النسخة التجريبية.</p>'}
       <button class="btn btn-line btn-block" data-copy-text style="margin-top:10px">انسخ تفاصيل الطلب</button>
@@ -25,7 +25,7 @@ Z.boot('cart').then((cat) => {
       <ul class="sum-items">${o.items.map((i) => `<li><span><bdi>${esc(i.name)}</bdi> <small>${i.size} مل × ${i.qty}</small></span><b>${Z.money(i.total)}</b></li>`).join('')}</ul>
       <div class="sum-row"><span>المجموع</span><span>${Z.money(o.subtotal)}</span></div>
       ${o.discount ? `<div class="sum-row good"><span>خصم ${esc(o.coupon)}</span><span>−${Z.money(o.discount)}</span></div>` : ''}
-      <div class="sum-row"><span>الشحن (${esc(o.address.zoneName)})</span><span>${Z.money(o.shipping)}</span></div>
+      <div class="sum-row"><span>الشحن (${esc(o.address.govName)})</span><span>${Z.money(o.shipping)}</span></div>
       <div class="sum-row total"><span>الإجمالي</span><b>${Z.money(o.total)}</b></div>
       <p class="policy-note">التوصيل لـ: ${esc(o.customer.name)} · <bdi dir="ltr">${esc(o.customer.phone)}</bdi><br>${esc(o.address.govName)} - ${esc(o.address.zoneName)} - ${esc(o.address.street)}</p>
     </div>

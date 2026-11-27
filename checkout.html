@@ -27,7 +27,7 @@
     <fieldset class="co-box"><legend>العنوان</legend>
       <div class="field-row">
         <div class="field"><label for="gov">المحافظة</label><select id="gov" name="gov" required></select><small class="err"></small></div>
-        <div class="field"><label for="zone">المنطقة</label><select id="zone" name="zone" required><option value="">اختار المحافظة الأول</option></select><small class="err"></small></div>
+        <div class="field"><label for="zone">المنطقة / المدينة</label><input id="zone" name="zone" required maxlength="60" placeholder="مثلاً: مدينة نصر"><small class="err"></small></div>
       </div>
       <div class="field"><label for="street">العنوان بالتفصيل</label><textarea id="street" name="street" rows="2" required maxlength="250" placeholder="الشارع، رقم العمارة، الدور، الشقة"></textarea><small class="err"></small></div>
       <div class="field"><label for="landmark">علامة مميزة <span class="opt">(اختياري)</span></label><input id="landmark" name="landmark" maxlength="100"></div>
