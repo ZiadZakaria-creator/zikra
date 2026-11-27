@@ -3,7 +3,7 @@ import { initializeApp } from 'https://www.gstatic.com/firebasejs/11.10.0/fireba
 import { getAuth, signInWithEmailAndPassword, onAuthStateChanged, signOut, sendPasswordResetEmail, connectAuthEmulator } from 'https://www.gstatic.com/firebasejs/11.10.0/firebase-auth.js';
 import {
   getFirestore, connectFirestoreEmulator, collection, doc, getDoc, getDocs, setDoc, updateDoc, deleteDoc,
-  query, orderBy, limit, runTransaction, Timestamp, arrayUnion, writeBatch
+  query, orderBy, limit, where, documentId, runTransaction, Timestamp, arrayUnion, writeBatch
 } from 'https://www.gstatic.com/firebasejs/11.10.0/firebase-firestore.js';
 
 const app = initializeApp(window.FIREBASE_CONFIG);
@@ -104,7 +104,7 @@ async function loadThumbs(ids) {
 }
 
 // ---------- Shell ----------
-const TABS = [['orders', 'الطلبات'], ['products', 'المنتجات'], ['coupons', 'أكواد الخصم'], ['settings', 'الشحن والإعدادات']];
+const TABS = [['orders', 'الطلبات'], ['products', 'المنتجات'], ['coupons', 'أكواد الخصم'], ['visits', 'الزيارات'], ['settings', 'الشحن والإعدادات']];
 function renderShell() {
   const newCount = S.orders.filter((o) => o.status === 'new').length;
   appEl.innerHTML = `<header class="a-top"><div class="wrap bar">
@@ -114,7 +114,7 @@ function renderShell() {
     <main class="wrap a-main" id="view"></main>`;
   $('#out').onclick = () => signOut(auth);
   appEl.querySelectorAll('[data-tab]').forEach((b) => (b.onclick = () => { S.tab = b.dataset.tab; renderShell(); }));
-  ({ orders: viewOrders, products: viewProducts, coupons: viewCoupons, settings: viewSettings })[S.tab]();
+  ({ orders: viewOrders, products: viewProducts, coupons: viewCoupons, visits: viewVisits, settings: viewSettings })[S.tab]();
 }
 const PUBLISH_URL = 'https://github.com/ZiadZakaria-creator/zikra/actions/workflows/deploy.yml';
 const publishNote = `<div class="a-note">تعديلات المنتجات والأسعار والشحن بتظهر على الموقع في النشر الجاي: أوتوماتيك كل ساعة، أو فوراً من <a href="${PUBLISH_URL}" target="_blank" rel="noopener"><b>انشر دلوقتي</b></a> (Run workflow). الطلبات بتوصل هنا على طول.</div>`;
@@ -560,6 +560,47 @@ function couponState(c) {
   if (c.expiresAt?.toDate && c.expiresAt.toDate() < new Date()) return ['منتهي (اتقفل لوحده)', 'st-cancelled'];
   return ['شغال', 'st-delivered'];
 }
+// ---------- Visits ----------
+const SRC = [['direct', 'دخول مباشر'], ['instagram', 'إنستجرام'], ['facebook', 'فيسبوك'], ['tiktok', 'تيك توك'], ['google', 'جوجل'], ['whatsapp', 'واتساب'], ['other', 'مواقع تانية']];
+const cairoDay = (d) => new Intl.DateTimeFormat('en-CA', { timeZone: 'Africa/Cairo' }).format(d);
+async function viewVisits() {
+  const v = $('#view');
+  v.innerHTML = '<div class="a-bar"><h1>الزيارات</h1></div><p class="empty">بيحمّل...</p>';
+  let days = [];
+  try {
+    const from = cairoDay(new Date(Date.now() - 40 * 864e5)); // ascending id range needs no extra index
+    const snap = await getDocs(query(collection(db, 'stats'), where(documentId(), '>=', from)));
+    days = snap.docs.map((d) => ({ day: d.id, ...d.data() }));
+  } catch (e) {
+    v.innerHTML = `<div class="a-bar"><h1>الزيارات</h1></div><div class="a-note">مش قادر يقرا الزيارات. اتأكد إنك نشرت قواعد الأمان الجديدة في Firebase (Firestore ← Rules).<br><small dir="ltr">${esc(e.code || e.message)}</small></div>`;
+    return;
+  }
+  if (S.tab !== 'visits') return;
+  const byDay = Object.fromEntries(days.map((d) => [d.day, d]));
+  const ordersOn = {};
+  for (const o of S.orders) { if (o.status === 'cancelled' || !o.createdAt?.toDate) continue; const k = cairoDay(o.createdAt.toDate()); ordersOn[k] = (ordersOn[k] || 0) + 1; }
+  const today = new Date(); const back = (n) => cairoDay(new Date(today.getTime() - n * 864e5));
+  const range = (n) => Array.from({ length: n }, (_, i) => back(i));
+  const sum = (keys, f) => keys.reduce((t, k) => t + (f(k) || 0), 0);
+  const card = (label, keys) => {
+    const vis = sum(keys, (k) => byDay[k]?.v), ord = sum(keys, (k) => ordersOn[k]);
+    return `<div class="stat"><span>${label}</span><b>${vis.toLocaleString('en-US')}</b><small>زائر · ${ord} طلب${vis ? ` · ${(ord / vis * 100).toFixed(1)}%` : ''}</small></div>`;
+  };
+  const last30 = range(30);
+  const srcTot = SRC.map(([k, l]) => [l, sum(last30, (d) => byDay[d]?.['s_' + k])]).filter(([, n]) => n).sort((a, b) => b[1] - a[1]);
+  const srcMax = Math.max(1, ...srcTot.map(([, n]) => n));
+  const rows = range(14);
+  v.innerHTML = `<div class="a-bar"><h1>الزيارات</h1></div>
+    <div class="stats">${card('النهارده', [back(0)])}${card('امبارح', [back(1)])}${card('آخر 7 أيام', range(7))}${card('آخر 30 يوم', last30)}</div>
+    <div class="box" style="margin-top:12px"><h3>جم منين؟ (آخر 30 يوم)</h3>
+      ${srcTot.length ? srcTot.map(([l, n]) => `<div class="bar-row"><span>${l}</span><i style="--w:${(n / srcMax * 100).toFixed(1)}%"></i><b>${n}</b></div>`).join('') : '<p class="meta">لسه مفيش زيارات.</p>'}</div>
+    <div class="box" style="margin-top:12px"><h3>يوم بيوم (آخر 14 يوم)</h3>
+      <table class="a-table"><thead><tr><th>اليوم</th><th>زوار</th><th>طلبات</th><th>نسبة الشرا</th></tr></thead><tbody>
+      ${rows.map((d) => { const vis = byDay[d]?.v || 0, ord = ordersOn[d] || 0; return `<tr><td>${new Date(d + 'T12:00:00').toLocaleDateString('ar-EG-u-nu-latn', { weekday: 'short', day: 'numeric', month: 'numeric' })}</td><td>${vis}</td><td>${ord}</td><td>${vis ? (ord / vis * 100).toFixed(1) + '%' : '—'}</td></tr>`; }).join('')}
+      </tbody></table></div>
+    <div class="a-note" style="margin-top:12px">الرقم ده عدد <b>الأجهزة</b> اللي فتحت الموقع في اليوم (نفس الموبايل بيتحسب مرة واحدة في اليوم مهما فتح صفحات). الطلبات من غير الملغية. "جم منين" بتتحدد من أول صفحة دخلها الزائر؛ ولو عايز تفرّق بين إعلان وبوست، حط في لينك الإعلان <bdi dir="ltr">?utm_source=instagram</bdi> مثلاً.</div>`;
+}
+
 function viewCoupons() {
   const v = $('#view');
   const today = new Date(); today.setDate(today.getDate() + 30);

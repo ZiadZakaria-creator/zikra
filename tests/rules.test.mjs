@@ -1,7 +1,7 @@
 // Security rules tests (run: cd tests && npm i && npm run rules)
 import { readFileSync } from 'node:fs';
 import { initializeTestEnvironment, assertSucceeds, assertFails } from '@firebase/rules-unit-testing';
-import { doc, setDoc, getDoc, getDocs, collection, updateDoc, serverTimestamp, Timestamp } from 'firebase/firestore';
+import { doc, setDoc, getDoc, getDocs, collection, updateDoc, serverTimestamp, Timestamp, increment, deleteDoc } from 'firebase/firestore';
 
 const env = await initializeTestEnvironment({
   projectId: 'demo-zikra',
@@ -71,6 +71,20 @@ await t('guest can get one coupon', () => assertSucceeds(getDoc(doc(guest, 'coup
 await t('guest cannot list coupons', () => assertFails(getDocs(collection(guest, 'coupons'))));
 await t('guest cannot create coupons', () => assertFails(setDoc(doc(guest, 'coupons/FREE'), { percent: 100, active: true })));
 await t('nobody can make themselves admin', () => assertFails(setDoc(doc(stranger, 'admins/someone'), { email: 'x' })));
+
+// Visitor counter
+const visit = (db, day, src) => setDoc(doc(db, 'stats', day), { v: increment(1), ['s_' + src]: increment(1) }, { merge: true });
+await t('guest can count a visit on a new day', () => assertSucceeds(visit(guest, '2026-11-27', 'direct')));
+await t('guest can count a second visit', () => assertSucceeds(visit(guest, '2026-11-27', 'instagram')));
+await t('reject adding 5 visitors at once', () => assertFails(setDoc(doc(guest, 'stats/2026-11-27'), { v: increment(5), s_direct: increment(5) }, { merge: true })));
+await t('reject visitor without source', () => assertFails(setDoc(doc(guest, 'stats/2026-11-27'), { v: increment(1) }, { merge: true })));
+await t('reject two sources in one visit', () => assertFails(setDoc(doc(guest, 'stats/2026-11-27'), { v: increment(1), s_direct: increment(1), s_google: increment(1) }, { merge: true })));
+await t('reject resetting the counter', () => assertFails(setDoc(doc(guest, 'stats/2026-11-27'), { v: 1, s_direct: 1 })));
+await t('reject unknown fields in stats', () => assertFails(setDoc(doc(guest, 'stats/2026-11-27'), { v: increment(1), s_direct: increment(1), x: 1 }, { merge: true })));
+await t('reject bad stats day id', () => assertFails(visit(guest, 'hack', 'direct')));
+await t('guest cannot read stats', () => assertFails(getDoc(doc(guest, 'stats/2026-11-27'))));
+await t('guest cannot delete stats', () => assertFails(deleteDoc(doc(guest, 'stats/2026-11-27'))));
+await t('admin can read stats', async () => { await assertSucceeds(getDocs(collection(admin, 'stats'))); const d = (await getDoc(doc(admin, 'stats/2026-11-27'))).data(); if (d.v !== 2 || d.s_instagram !== 1) throw new Error(JSON.stringify(d)); });
 
 await env.cleanup();
 for (const [s, name] of results) console.log(s, name);
