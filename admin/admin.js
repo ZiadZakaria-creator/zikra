@@ -247,6 +247,8 @@ function viewProducts() {
   const v = $('#view');
   v.innerHTML = `${publishNote}<div class="a-bar"><h1>المنتجات (${S.products.length})</h1><div class="btn-row">
     ${S.products.length ? '' : '<button class="btn btn-line btn-sm" id="seed">استورد العطور الحالية من الموقع</button>'}
+    <button class="btn btn-line btn-sm" id="xexp">نزّل شيت Excel</button>
+    <label class="btn btn-line btn-sm" for="ximp">استورد من Excel</label><input type="file" id="ximp" accept=".xlsx,.xls,.csv" hidden>
     <button class="btn btn-dark btn-sm" id="newp">+ منتج جديد</button></div></div>
     <div class="p-grid">${S.products.map((p) => {
       const stock = (p.variants || []).reduce((n, x) => n + Number(x.stock || 0), 0);
@@ -258,6 +260,101 @@ function viewProducts() {
   $('#newp').onclick = () => openProduct(null);
   v.querySelectorAll('[data-p]').forEach((b) => (b.onclick = () => openProduct(b.dataset.p)));
   const seed = $('#seed'); if (seed) seed.onclick = seedFromSite;
+  $('#xexp').onclick = () => guard(exportExcel);
+  $('#ximp').onchange = (e) => { const f = e.target.files[0]; e.target.value = ''; if (f) guard(() => importExcel(f)); };
+}
+
+// ---------- Excel import / export ----------
+// One row per product size. Rows with the same slug belong to the same product.
+const XL = 'https://cdn.sheetjs.com/xlsx-0.20.3/package/xlsx.mjs';
+const COLS = ['الرابط', 'اسم العطر', 'لمين', 'النوع', 'مستوحى من', 'عائلة الريحة', 'المناسبة', 'الحجم (مل)', 'السعر', 'المخزون', 'معاه تستر', 'ظاهر'];
+const rev = (map) => Object.fromEntries(Object.entries(map).map(([k, v]) => [v, k]));
+const yes = (v) => ['نعم', 'ايوه', 'أيوه', 'yes', 'y', 'true', '1', '✓'].includes(String(v ?? '').trim().toLowerCase());
+const splitList = (v) => String(v ?? '').split(/[,،\/]/).map((x) => x.trim()).filter(Boolean);
+
+async function exportExcel() {
+  const X = await import(XL);
+  const rows = [COLS];
+  const src = S.products.length ? S.products : (await (await fetch('../data/catalog.json', { cache: 'no-cache' })).json()).products;
+  for (const p of src) for (const v of p.variants || []) {
+    rows.push([p.slug, p.name, L.gender[p.gender] || '', L.line[p.line] || '', p.inspiredBy || '', (p.families || []).map((f) => L.family[f]).join('، '),
+      (p.occasions || []).map((o) => L.occasion[o]).join('، '), v.size, v.price, v.stock, v.tester ? 'نعم' : 'لا', p.active === false ? 'لا' : 'نعم']);
+  }
+  const ws = X.utils.aoa_to_sheet(rows);
+  ws['!cols'] = [16, 20, 10, 10, 18, 22, 22, 10, 10, 10, 10, 8].map((w) => ({ wch: w }));
+  ws['!views'] = [{ RTL: true }];
+  const wb = X.utils.book_new(); X.utils.book_append_sheet(wb, ws, 'المنتجات');
+  X.writeFile(wb, `zikra-products-${new Date().toISOString().slice(0, 10)}.xlsx`);
+}
+
+async function importExcel(file) {
+  const X = await import(XL);
+  const wb = X.read(await file.arrayBuffer());
+  const rows = X.utils.sheet_to_json(wb.Sheets[wb.SheetNames[0]], { defval: '' });
+  const G = rev(L.gender), LN = rev(L.line), F = rev(L.family), O = rev(L.occasion);
+  const errors = []; const groups = new Map();
+  rows.forEach((r, i) => {
+    const line = i + 2;
+    const name = String(r['اسم العطر']).trim();
+    const slug = slugify(r['الرابط'] || name);
+    if (!name && !r['الرابط']) return; // empty row
+    if (!slug) return errors.push(`صف ${line}: الرابط لازم يبقى حروف إنجليزي أو أرقام`);
+    const size = Number(r['الحجم (مل)']), price = Number(r['السعر']), stock = Number(r['المخزون']);
+    if (!(size > 0)) errors.push(`صف ${line}: الحجم مش صحيح`);
+    if (!(price > 0) || !Number.isInteger(price)) errors.push(`صف ${line}: اكتب السعر رقم صحيح أكبر من صفر`);
+    if (!(stock >= 0) || String(r['المخزون']).trim() === '' || !Number.isInteger(stock)) errors.push(`صف ${line}: اكتب المخزون رقم (صفر أو أكتر)`);
+    const g = groups.get(slug) || { slug, name, rows: [], first: r, line };
+    g.rows.push({ size, price, stock, tester: yes(r['معاه تستر']), line });
+    groups.set(slug, g);
+  });
+  const plan = [];
+  for (const g of groups.values()) {
+    const r = g.first; const existing = S.products.find((p) => p.slug === g.slug);
+    if (new Set(g.rows.map((x) => x.size)).size !== g.rows.length) errors.push(`${g.slug}: فيه حجم متكرر`);
+    const pick = (col, map, fallback) => { const v = String(r[col]).trim(); if (!v) return fallback; if (!map[v]) { errors.push(`صف ${g.line}: "${v}" مش من الاختيارات في عمود ${col}`); return fallback; } return map[v]; };
+    const pickList = (col, map, fallback) => { const vals = splitList(r[col]); if (!vals.length) return fallback; const bad = vals.filter((v) => !map[v]); if (bad.length) errors.push(`صف ${g.line}: "${bad.join('، ')}" مش من الاختيارات في عمود ${col}`); return vals.filter((v) => map[v]).map((v) => map[v]); };
+    const base = existing ? structuredClone(existing) : { notes: { top: [], heart: [], base: [] }, longevity: 3, sillage: 3, likeIf: '', description: '', images: [], seasons: [], times: [], nonReturnable: false, createdAt: new Date().toISOString().slice(0, 10) };
+    const p = {
+      ...base, slug: g.slug, name: g.name || base.name,
+      gender: pick('لمين', G, base.gender), line: pick('النوع', LN, base.line || 'zikra'),
+      inspiredBy: String(r['مستوحى من']).trim() || base.inspiredBy || '',
+      families: pickList('عائلة الريحة', F, base.families || []), occasions: pickList('المناسبة', O, base.occasions || []),
+      variants: g.rows.map(({ size, price, stock, tester }) => ({ size, price, stock, tester })).sort((a, b) => a.size - b.size),
+      active: String(r['ظاهر']).trim() ? yes(r['ظاهر']) : base.active !== false
+    };
+    if (!p.name) errors.push(`${g.slug}: اسم العطر ناقص`);
+    if (!p.gender) errors.push(`${g.slug}: عمود "لمين" ناقص (رجالي / حريمي / يونيسكس)`);
+    if (!p.families.length) errors.push(`${g.slug}: اختار عائلة ريحة واحدة على الأقل`);
+    if (p.line === 'inspired' && !p.inspiredBy) errors.push(`${g.slug}: العطر المستوحى لازم يتكتب "مستوحى من"`);
+    plan.push({ id: existing ? existing.id : 'p-' + g.slug, p, isNew: !existing, before: existing });
+  }
+  showImportPreview(plan, errors, rows.length);
+}
+
+function showImportPreview(plan, errors, total) {
+  const m = document.createElement('div'); m.className = 'modal';
+  const diff = (x) => x.isNew ? '<span class="st st-new">جديد</span>' : (x.before.variants || []).map((v) => `${v.size}مل ${money(v.price)}/${v.stock}`).join('، ') + ' ← ';
+  m.innerHTML = `<div class="sheet"><div class="sheet-head"><h2>مراجعة الاستيراد</h2><button class="icon-btn" data-close aria-label="اقفل">✕</button></div>
+    ${errors.length ? `<div class="a-note"><b>لازم تصلّح دول في الشيت الأول (مفيش حاجة اتحفظت):</b><br>${errors.map(esc).join('<br>')}</div>` : `<p>${plan.filter((x) => x.isNew).length} منتج جديد، و${plan.filter((x) => !x.isNew).length} هيتحدّث. الصور والوصف والمكونات مش بتتغير من الشيت.</p>`}
+    <div class="box"><table class="a-table"><thead><tr><th>العطر</th><th>قبل ← بعد (الحجم السعر/المخزون)</th><th>ظاهر</th></tr></thead><tbody>
+    ${plan.map((x) => `<tr><td><bdi>${esc(x.p.name)}</bdi><div class="meta" dir="ltr">${esc(x.p.slug)}</div></td><td>${diff(x)}<b>${x.p.variants.map((v) => `${v.size}مل ${money(v.price)}/${v.stock}${v.tester ? ' +تستر' : ''}`).join('، ')}</b></td><td>${x.p.active ? 'نعم' : 'لا'}</td></tr>`).join('')}
+    </tbody></table></div>
+    <div class="btn-row" style="margin-top:12px">${errors.length ? '' : '<button class="btn btn-gold" id="doimp">احفظ التغييرات</button>'}<button class="btn btn-line" data-close>إلغاء</button></div></div>`;
+  document.body.appendChild(m);
+  m.onclick = (e) => { if (e.target === m || e.target.closest('[data-close]')) m.remove(); };
+  const go = $('#doimp', m);
+  if (go) go.onclick = async () => {
+    go.disabled = true;
+    await guard(async () => {
+      for (let i = 0; i < plan.length; i += 400) {
+        const batch = writeBatch(db);
+        plan.slice(i, i + 400).forEach(({ id, p }) => { const { id: _d, ...data } = p; data.updatedAt = new Date().toISOString(); batch.set(doc(db, 'products', id), data); });
+        await batch.commit();
+      }
+      const ps = await getDocs(collection(db, 'products')); S.products = ps.docs.map((d) => ({ ...d.data(), id: d.id }));
+    }, `اتحفظ ${plan.length} منتج`);
+    m.remove(); viewProducts();
+  };
 }
 
 const chk = (name, map, sel = []) => `<div class="chk">${Object.entries(map).map(([k, l]) => `<label><input type="checkbox" name="${name}" value="${k}" ${sel.includes(k) ? 'checked' : ''}>${l}</label>`).join('')}</div>`;
