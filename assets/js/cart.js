@@ -38,7 +38,7 @@ Z.boot('cart').then((cat) => {
       <div class="sum-row muted"><span>الشحن</span><span>بيتحسب حسب منطقتك في الخطوة الجاية</span></div>
       <a class="btn btn-gold btn-block ${blocked ? 'is-disabled' : ''}" href="${blocked ? '#' : 'checkout.html'}" ${blocked ? 'aria-disabled="true"' : ''}>كمّل الطلب</a>
       <a class="btn btn-line btn-block" href="shop.html">كمّل تسوّق</a>
-      <p class="policy-note">الدفع عند الاستلام أو محفظة / إنستاباي. <a href="returns.html">سياسة الاسترجاع</a></p>
+      <p class="policy-note">الدفع عند الاستلام (الشحن بس مقدّم) أو محفظة / إنستاباي. <a href="returns.html">سياسة الاسترجاع</a></p>
     </aside>`;
   }
 

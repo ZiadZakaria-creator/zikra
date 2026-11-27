@@ -5,7 +5,9 @@ Z.boot('cart').then((cat) => {
   const o = id && Z.orders.get(id);
   const box = document.getElementById('order');
   if (!o) { box.innerHTML = '<p class="empty">مش لاقيين الأوردر ده على الجهاز ده. لو عملت طلب، كلمنا على واتساب برقم الأوردر.</p>'; return; }
-  const text = Z.orderText(o);
+  const text = Z.orderText(o, s);
+  const dep = o.payment !== 'wallet' && Z.codDeposit(s);
+  const payNow = o.payment === 'wallet' ? o.total : dep ? o.shipping : 0;
   const hasWa = !!(s.whatsapp || '').replace(/\D/g, '');
   box.innerHTML = `
     <div class="done-head"><div class="check-ic">✓</div><h1>طلبك اتسجّل</h1><p>رقم الأوردر</p>
@@ -18,11 +20,11 @@ Z.boot('cart').then((cat) => {
         : '<p class="demo-note">رقم واتساب المتجر لسه ماتحطش، فالزرار مش شغال في النسخة التجريبية.</p>'}
       <button class="btn btn-line btn-block" data-copy-text style="margin-top:10px">انسخ تفاصيل الطلب</button>
     </div>
-    ${o.payment === 'wallet' ? `<div class="co-box"><h2>بيانات التحويل</h2>
-      <p>حوّل <b>${Z.money(o.total)}</b> على المحفظة أو إنستاباي:</p>
+    ${payNow ? `<div class="co-box"><h2>${dep ? 'حوّل مصاريف الشحن مقدّم' : 'بيانات التحويل'}</h2>
+      <p>حوّل <b>${Z.money(payNow)}</b> على المحفظة أو إنستاباي:</p>
       <div class="order-id"><bdi dir="ltr">${esc(s.walletNumber)}</bdi><button class="chip" data-copy-wallet>انسخ</button></div>
       ${s.walletName ? `<p class="policy-note">اتأكد إن الاسم اللي هيظهرلك وانت بتحوّل: <b>${esc(s.walletName)}</b></p>` : ''}
-      <p class="policy-note">ابعت صورة التحويل على واتساب مع رقم الأوردر. هنبدأ نجهّز الطلب بعد ما نتأكد من التحويل.</p></div>` : ''}
+      <p class="policy-note">ابعت صورة التحويل على واتساب مع رقم الأوردر. هنبدأ نجهّز الطلب بعد ما نتأكد من التحويل.${dep ? ` والباقي <b>${Z.money(o.total - o.shipping)}</b> كاش للمندوب وقت الاستلام.` : ''}</p></div>` : ''}
     <div class="co-box"><h2>ملخص الطلب</h2>
       <ul class="sum-items">${o.items.map((i) => `<li><span><bdi>${esc(i.name)}</bdi> <small>${i.size} مل × ${i.qty}</small></span><b>${Z.money(i.total)}</b></li>`).join('')}</ul>
       <div class="sum-row"><span>المجموع</span><span>${Z.money(o.subtotal)}</span></div>

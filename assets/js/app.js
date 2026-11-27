@@ -194,7 +194,9 @@
   const normPhone = (s) => String(s || '').replace(/[٠-٩]/g, (d) => '٠١٢٣٤٥٦٧٨٩'.indexOf(d)).replace(/\D/g, '').replace(/^20(?=1)/, '0');
   const validPhone = (s) => /^01[0125]\d{8}$/.test(normPhone(s));
 
-  function orderText(o) {
+  // Cash on delivery can require the shipping fee up front (settings.payment.codDeposit, on by default).
+  const codDeposit = (s) => !!(s && s.payment && s.payment.cod && s.payment.codDeposit !== false);
+  function orderText(o, s) {
     const lines = o.items.map((i) => `- ${i.name} (${i.size} مل) × ${i.qty} = ${money(i.total)}`).join('\n');
     return [
       `طلب جديد من موقع ذِكرى`,
@@ -211,7 +213,8 @@
       o.discount ? `الخصم (${o.coupon}): -${money(o.discount)}` : null,
       `الشحن: ${money(o.shipping)}`,
       `الإجمالي: ${money(o.total)}`,
-      `الدفع: ${o.payment === 'wallet' ? 'محفظة / إنستاباي' : 'عند الاستلام'}`,
+      o.payment === 'wallet' ? 'الدفع: محفظة / إنستاباي'
+        : codDeposit(s) ? `الدفع: عند الاستلام (الشحن ${money(o.shipping)} مقدّم على المحفظة، والباقي ${money(o.total - o.shipping)} للمندوب)` : 'الدفع: عند الاستلام',
       o.notes ? `ملاحظات: ${o.notes}` : null
     ].filter((x) => x !== null).join('\n');
   }
@@ -380,5 +383,5 @@
     }
   }
 
-  window.Z = { track, LABELS, BUDGETS, I, esc, money, store, loadCatalog, minPrice, inStock, productUrl, familyLine, subLine, card, cart, orders, checkCoupon, normPhone, validPhone, orderText, toast, waLink, boot };
+  window.Z = { track, LABELS, BUDGETS, I, esc, money, store, loadCatalog, minPrice, inStock, productUrl, familyLine, subLine, card, cart, orders, checkCoupon, normPhone, validPhone, orderText, codDeposit, toast, waLink, boot };
 })();
