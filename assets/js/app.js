@@ -113,8 +113,36 @@
     }
   };
 
+  // ---------- Firestore REST (public pages stay SDK-free) ----------
+  const FB = window.FIREBASE_CONFIG || null;
+  const fsBase = () => (window.FIRESTORE_EMULATOR
+    ? `http://${window.FIRESTORE_EMULATOR}/v1/projects/${FB.projectId}/databases/(default)/documents`
+    : `https://firestore.googleapis.com/v1/projects/${FB.projectId}/databases/(default)/documents`);
+  function toFs(v) {
+    if (v === null || v === undefined) return { nullValue: null };
+    if (typeof v === 'boolean') return { booleanValue: v };
+    if (typeof v === 'number') return Number.isInteger(v) ? { integerValue: String(v) } : { doubleValue: v };
+    if (typeof v === 'string') return { stringValue: v };
+    if (Array.isArray(v)) return { arrayValue: { values: v.map(toFs) } };
+    return { mapValue: { fields: Object.fromEntries(Object.entries(v).map(([k, x]) => [k, toFs(x)])) } };
+  }
+  function fromFs(f) {
+    if (!f) return undefined;
+    if ('stringValue' in f) return f.stringValue;
+    if ('integerValue' in f) return Number(f.integerValue);
+    if ('doubleValue' in f) return f.doubleValue;
+    if ('booleanValue' in f) return f.booleanValue;
+    if ('timestampValue' in f) return new Date(f.timestampValue);
+    if ('nullValue' in f) return null;
+    if ('arrayValue' in f) return (f.arrayValue.values || []).map(fromFs);
+    if ('mapValue' in f) return Object.fromEntries(Object.entries(f.mapValue.fields || {}).map(([k, x]) => [k, fromFs(x)]));
+    return undefined;
+  }
+
   // ---------- Orders ----------
-  // Phase B keeps orders on this device; phase C swaps save() for a Firestore write.
+  // Orders go to Firestore; a copy stays on the device for the confirmation page.
+  // If Firestore refuses (offline, outdated prices), the order is kept locally and
+  // the customer is pushed to send it on WhatsApp so it is never lost.
   const ORDERS_KEY = 'zikra_orders';
   const orders = {
     newId() {
@@ -124,19 +152,41 @@
       const tail = Array.from(rnd, (n) => abc[n % abc.length]).join('');
       return `ZK-${String(d.getFullYear()).slice(2)}${pad(d.getMonth() + 1)}${pad(d.getDate())}-${tail}`;
     },
-    async save(order) { const all = store.get(ORDERS_KEY, []); all.unshift(order); store.set(ORDERS_KEY, all.slice(0, 20)); return order.id; },
+    keepLocal(order) { const all = store.get(ORDERS_KEY, []); all.unshift(order); store.set(ORDERS_KEY, all.slice(0, 20)); },
+    async save(order) {
+      let synced = false;
+      if (FB) {
+        const { createdAt, ...data } = order;
+        const body = { writes: [{
+          update: { name: `projects/${FB.projectId}/databases/(default)/documents/orders/${order.id}`, fields: toFs(data).mapValue.fields },
+          currentDocument: { exists: false },
+          updateTransforms: [{ fieldPath: 'createdAt', setToServerValue: 'REQUEST_TIME' }]
+        }] };
+        try {
+          const r = await fetch(`${fsBase()}:commit?key=${FB.apiKey}`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) });
+          synced = r.ok;
+        } catch (e) { synced = false; }
+      }
+      orders.keepLocal({ ...order, synced });
+      return synced;
+    },
     get(id) { return store.get(ORDERS_KEY, []).find((o) => o.id === id) || null; }
   };
 
-  // Demo coupons only exist until the admin panel (phase C) manages real ones.
-  const DEMO_COUPONS = { ZIKRA10: { percent: 10, expires: '2026-12-31' } };
-  async function checkCoupon(code, demo) {
+  // Coupons live in Firestore (coupons/{CODE}); visitors can read one code at a time.
+  async function checkCoupon(code) {
     const c = String(code || '').trim().toUpperCase();
     if (!c) return null;
-    const hit = demo ? DEMO_COUPONS[c] : null;
-    if (!hit) return { ok: false, msg: 'الكود ده مش صحيح' };
-    if (new Date(hit.expires + 'T23:59:59') < new Date()) return { ok: false, msg: 'الكود ده انتهى' };
-    return { ok: true, code: c, percent: hit.percent };
+    if (!/^[A-Z0-9]{3,20}$/.test(c) || !FB) return { ok: false, msg: 'الكود ده مش صحيح' };
+    try {
+      const r = await fetch(`${fsBase()}/coupons/${c}?key=${FB.apiKey}`);
+      if (r.status === 404 || r.status === 403) return { ok: false, msg: 'الكود ده مش صحيح' };
+      if (!r.ok) return { ok: false, msg: 'مش قادرين نتأكد من الكود دلوقتي. جرّب تاني.' };
+      const d = fromFs({ mapValue: { fields: (await r.json()).fields || {} } });
+      if (!d.active) return { ok: false, msg: 'الكود ده متوقف' };
+      if (!(d.expiresAt instanceof Date) || d.expiresAt < new Date()) return { ok: false, msg: 'الكود ده انتهى' };
+      return { ok: true, code: c, percent: Number(d.percent) };
+    } catch (e) { return { ok: false, msg: 'مش قادرين نتأكد من الكود دلوقتي. جرّب تاني.' }; }
   }
 
   const normPhone = (s) => String(s || '').replace(/[٠-٩]/g, (d) => '٠١٢٣٤٥٦٧٨٩'.indexOf(d)).replace(/\D/g, '').replace(/^20(?=1)/, '0');
