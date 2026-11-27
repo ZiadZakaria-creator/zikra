@@ -74,9 +74,40 @@ table.a-table{width:100%;border-collapse:collapse;font-size:13px}
 }
 @media print{
   body.admin > *:not(#invoice){display:none!important}
-  #invoice{display:block!important;color:#000;background:#fff;font-size:13px;padding:0}
-  #invoice h1{font-family:var(--head);font-size:24px}
-  #invoice table{width:100%;border-collapse:collapse;margin:12px 0}
-  #invoice th,#invoice td{border:1px solid #999;padding:6px;text-align:right}
-  @page{size:A5;margin:12mm}
+  body.admin{background:#fff}
+  #invoice{display:block!important}
+  /* margin:0 also stops the browser from printing its own date/URL header and footer */
+  @page{size:A5;margin:0}
 }
+#invoice{-webkit-print-color-adjust:exact;print-color-adjust:exact;color:#1a1814;font-family:var(--body)}
+.inv{width:148mm;min-height:210mm;padding:0 0 10mm;display:flex;flex-direction:column;background:#fff;font-size:11px;line-height:1.55}
+.inv-head{background:var(--ink);color:var(--cream);display:flex;justify-content:space-between;align-items:center;padding:7mm 10mm 6mm;border-bottom:2px solid var(--gold)}
+.inv-logo{height:24mm;width:auto}
+.inv-meta{text-align:left;color:var(--soft);font-size:10.5px}
+.inv-title{font-family:var(--head);color:var(--gold);font-size:22px;line-height:1.1}
+.inv-id{font-weight:600;color:var(--cream);letter-spacing:.06em;font-size:12px;margin:2px 0}
+.inv-parties{display:grid;grid-template-columns:1fr 1fr;gap:4mm;padding:6mm 10mm 0}
+.inv-box{background:var(--cream);border:1px solid var(--line);border-radius:3mm;padding:3mm 4mm}
+.inv h4{font-family:var(--latin);font-weight:500;color:var(--gold);font-size:10px;letter-spacing:.06em;margin-bottom:1mm;font-family:var(--body)}
+.inv-ltr{text-align:right}
+.inv-muted{color:var(--muted);font-size:10px}
+.inv-table{width:calc(100% - 20mm);margin:5mm 10mm 0;border-collapse:collapse}
+.inv-table th{background:var(--ink);color:var(--gold-2);font-weight:500;padding:2mm 3mm;text-align:right;font-size:10px}
+.inv-table th:first-child{border-radius:0 2mm 0 0}.inv-table th:last-child{border-radius:2mm 0 0 0}
+.inv-table td{padding:2.5mm 3mm;border-bottom:1px solid var(--line);vertical-align:top}
+.inv-table tbody tr:nth-child(even) td{background:#faf6ef}
+.inv-table td:last-child{font-weight:600}
+.inv-gift{color:var(--gold);font-size:9.5px}
+.inv-bottom{display:grid;grid-template-columns:1fr 1fr;gap:5mm;padding:5mm 10mm 0;align-items:start}
+.inv-pill{display:inline-block;background:var(--ink);color:var(--gold-2);border-radius:99px;padding:1mm 4mm;font-size:10.5px;margin-bottom:1mm}
+.inv-totals{border:1px solid var(--line);border-radius:3mm;overflow:hidden}
+.inv-totals div{display:flex;justify-content:space-between;padding:1.8mm 4mm;border-bottom:1px solid var(--line)}
+.inv-totals .inv-grand{background:var(--gold);color:var(--ink);font-weight:700;font-size:13px;border:0}
+.inv-tip{margin:5mm 10mm 0;padding:3mm 4mm;border-right:2px solid var(--gold);background:#fbf5e8;font-size:10px}
+.inv-foot{margin-top:auto;padding:6mm 10mm 0;text-align:center}
+.inv-orn{display:flex;align-items:center;justify-content:center;gap:3mm;color:var(--gold);font-size:12px}
+.inv-orn span{display:block;width:28mm;height:1px;background:var(--gold)}
+.inv-thanks{font-family:var(--head);font-size:17px;margin-top:2mm}
+.inv-tag{font-family:var(--latin);color:var(--gold);font-size:12px;letter-spacing:.05em}
+.inv-policy{color:var(--muted);font-size:9.5px;margin-top:2mm}
+.inv-contact{font-size:10px;margin-top:1mm}

@@ -230,15 +230,49 @@ async function changeStatus(o, to) {
   const ps = await getDocs(collection(db, 'products')); S.products = ps.docs.map((d) => ({ ...d.data(), id: d.id }));
 }
 
-function printInvoice(o) {
+async function printInvoice(o) {
   const s = S.settings || {};
-  $('#invoice').innerHTML = `<div style="display:flex;justify-content:space-between;align-items:center"><h1>ذِكرى</h1><div>فاتورة<br><b dir="ltr">${esc(o.id)}</b></div></div>
-    <p>التاريخ: ${fmtDate(o.createdAt)}</p>
-    <p><b>${esc(o.customer.name)}</b> · <span dir="ltr">${esc(o.customer.phone)}</span><br>${esc(o.address.govName)} - ${esc(o.address.zoneName)} - ${esc(o.address.street)}</p>
-    <table><thead><tr><th>العطر</th><th>الحجم</th><th>السعر</th><th>الكمية</th><th>الإجمالي</th></tr></thead><tbody>
-    ${o.items.map((i) => `<tr><td>${esc(i.name)}</td><td>${i.size} مل</td><td>${money(i.price)}</td><td>${i.qty}</td><td>${money(i.price * i.qty)}</td></tr>`).join('')}</tbody></table>
-    <p>المجموع: ${money(o.subtotal)}${o.discount ? `<br>الخصم (${esc(o.coupon)}): −${money(o.discount)}` : ''}<br>الشحن: ${money(o.shipping)}<br><b>الإجمالي: ${money(o.total)}</b><br>الدفع: ${o.payment === 'wallet' ? 'محفظة / إنستاباي' : 'عند الاستلام'}</p>
-    <p style="font-size:11px">الاستبدال والاسترجاع خلال 14 يوم للزجاجة المقفولة في علبتها. للمشاكل كلمنا خلال 24 ساعة من الاستلام${s.whatsapp ? ' على واتساب ' + esc(s.whatsapp.replace(/^20/, '0')) : ''}.</p>`;
+  const wa = (s.whatsapp || '').replace(/^20/, '0');
+  const pay = o.payment === 'wallet' ? 'محفظة / إنستاباي' : 'الدفع عند الاستلام';
+  const d = o.createdAt?.toDate ? o.createdAt.toDate() : new Date();
+  const testers = o.items.filter((i) => i.tester).reduce((n, i) => n + i.qty, 0);
+  $('#invoice').innerHTML = `<div class="inv">
+    <header class="inv-head">
+      <img src="../assets/brand/logo-full-gold.webp" alt="ذِكرى" class="inv-logo">
+      <div class="inv-meta"><div class="inv-title">فاتورة</div>
+        <div class="inv-id" dir="ltr">${esc(o.id)}</div>
+        <div>${d.toLocaleDateString('ar-EG-u-nu-latn', { year: 'numeric', month: 'long', day: 'numeric' })}</div></div>
+    </header>
+    <section class="inv-parties">
+      <div class="inv-box"><h4>العميل</h4><b>${esc(o.customer.name)}</b><div dir="ltr" class="inv-ltr">${esc(o.customer.phone)}${o.customer.phone2 ? ' · ' + esc(o.customer.phone2) : ''}</div></div>
+      <div class="inv-box"><h4>التوصيل</h4><b>${esc(o.address.govName)} - ${esc(o.address.zoneName)}</b><div>${esc(o.address.street)}</div>${o.address.landmark ? `<div class="inv-muted">${esc(o.address.landmark)}</div>` : ''}</div>
+    </section>
+    <table class="inv-table"><thead><tr><th>العطر</th><th>الحجم</th><th>السعر</th><th>الكمية</th><th>الإجمالي</th></tr></thead><tbody>
+      ${o.items.map((i) => `<tr><td><b dir="auto">${esc(i.name)}</b>${i.tester ? '<div class="inv-gift">+ تستر 3 مل هدية</div>' : ''}</td><td>${i.size} مل</td><td>${money(i.price)}</td><td>${i.qty}</td><td>${money(i.price * i.qty)}</td></tr>`).join('')}
+    </tbody></table>
+    <section class="inv-bottom">
+      <div class="inv-pay"><h4>طريقة الدفع</h4><span class="inv-pill">${pay}</span>
+        ${o.payment === 'wallet' && s.walletNumber ? `<div class="inv-muted">على رقم <span dir="ltr">${esc(s.walletNumber)}</span></div>` : ''}
+        ${o.payment !== 'wallet' ? `<div class="inv-muted">المطلوب من المندوب: <b>${money(o.total)}</b></div>` : ''}</div>
+      <div class="inv-totals">
+        <div><span>المجموع</span><span>${money(o.subtotal)}</span></div>
+        ${o.discount ? `<div><span>خصم ${esc(o.coupon)}</span><span>−${money(o.discount)}</span></div>` : ''}
+        <div><span>الشحن (${esc(o.address.govName)})</span><span>${money(o.shipping)}</span></div>
+        <div class="inv-grand"><span>الإجمالي</span><span>${money(o.total)}</span></div>
+      </div>
+    </section>
+    ${testers ? `<div class="inv-tip"><b>جرّب قبل ما تفتح:</b> جرّب التستر الأول وسيب الريحة تاخد وقتها، وخلّي الزجاجة الكبيرة مقفولة لحد ما تتأكد إنها ريحتك. الزجاجة المفتوحة مابتترجعش.</div>` : ''}
+    <footer class="inv-foot">
+      <div class="inv-orn" aria-hidden="true"><span></span>✦<span></span></div>
+      <div class="inv-thanks">شكراً إنك اخترت ذِكرى</div>
+      <div class="inv-tag" dir="ltr">Where memories linger</div>
+      <div class="inv-policy">الاستبدال والاسترجاع خلال 14 يوم للزجاجة المقفولة في علبتها الأصلية. لو الأوردر وصلك فيه مشكلة كلمنا خلال 24 ساعة من الاستلام.</div>
+      <div class="inv-contact">${wa ? `واتساب <span dir="ltr">${esc(wa)}</span>` : ''}${s.instagram ? ` · <span dir="ltr">${esc(s.instagram.replace(/^https?:\/\/(www\.)?/, ''))}</span>` : ''}</div>
+    </footer>
+  </div>`;
+  // Wait for the logo so it is not missing on paper
+  const img = $('#invoice img');
+  if (img && !img.complete) await new Promise((r) => { img.onload = img.onerror = r; setTimeout(r, 3000); });
   window.print();
 }
 
