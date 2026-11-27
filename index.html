@@ -10,14 +10,17 @@
 <link rel="apple-touch-icon" href="assets/brand/apple-touch-icon.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Alexandria:wght@300;400;500;600&family=Cormorant+Garamond:wght@500&family=El+Messiri:wght@500;600;700&display=swap" rel="stylesheet">
+<link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Alexandria:wght@300;400;500;600&family=Cormorant+Garamond:wght@500&family=El+Messiri:wght@500;600;700&display=swap">
+<link href="https://fonts.googleapis.com/css2?family=Alexandria:wght@300;400;500;600&family=Cormorant+Garamond:wght@500&family=El+Messiri:wght@500;600;700&display=swap" rel="stylesheet" media="print" onload="this.media='all'">
+<noscript><link href="https://fonts.googleapis.com/css2?family=Alexandria:wght@300;400;500;600&family=Cormorant+Garamond:wght@500&family=El+Messiri:wght@500;600;700&display=swap" rel="stylesheet"></noscript>
+<link rel="preload" as="image" href="assets/img/products/mambo-no-05-3-640.webp" imagesrcset="assets/img/products/mambo-no-05-3-640.webp 640w, assets/img/products/mambo-no-05-3-1100.webp 1100w" imagesizes="(min-width:768px) 50vw, 100vw">
 <link rel="stylesheet" href="assets/css/main.css">
 </head>
 <body>
 <div id="site-header"></div>
 <main id="main">
 <section class="hero">
-  <div class="hero-img"><img src="assets/img/products/mambo-no-05-3.webp" alt="" fetchpriority="high" width="1121" height="1403"></div>
+  <div class="hero-img"><img src="assets/img/products/mambo-no-05-3-1100.webp" srcset="assets/img/products/mambo-no-05-3-640.webp 640w, assets/img/products/mambo-no-05-3-1100.webp 1100w" sizes="(min-width:768px) 50vw, 100vw" alt="" fetchpriority="high" width="960" height="1200"></div>
   <div class="content">
     <div class="tagline">Where memories linger</div>
     <h1>ريحة <em>تفضل</em><br>في الذاكرة</h1>
@@ -75,7 +78,7 @@
 </div></section>
 
 <section class="statement">
-  <img src="assets/brand/logo-full-gold.webp" alt="ذِكرى — Where memories linger" loading="lazy" width="300" height="268">
+  <img src="assets/brand/logo-full-gold.webp" alt="ذِكرى — Where memories linger" loading="lazy" width="300" height="267" decoding="async">
   <p>كل ريحة بتحكي ذكرى.<br>اختار اللي تفضل معاك.</p>
 </section>
 </main>

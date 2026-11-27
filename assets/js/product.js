@@ -1,14 +1,19 @@
 /* Product page: gallery, size picker, pyramid, meters, similar */
 Z.boot('shop').then((cat) => {
   const L = Z.LABELS, esc = Z.esc, s = cat.settings;
-  const slug = new URLSearchParams(location.search).get('p');
+  const param = new URLSearchParams(location.search).get('p');
+  const slug = param || document.body.dataset.slug;
+  // Old links (product.html?p=) move to the pre-rendered page
+  if (param && cat.built) { location.replace('p/' + encodeURIComponent(param) + '/'); return; }
   const p = cat.products.find((x) => x.slug === slug);
   const root = document.getElementById('pdp');
   if (!p) { root.innerHTML = '<p class="empty">العطر ده مش موجود. <a class="chip" href="shop.html">شوف كل العطور</a></p>'; return; }
 
-  document.title = `${p.name} | ذِكرى`;
-  const md = document.querySelector('meta[name=description]');
-  if (md) md.content = `${p.name}: ${p.description} ${L.gender[p.gender]}، ${Z.familyLine(p)}.`;
+  if (!document.body.dataset.slug) { // pre-rendered pages already carry SEO title/description
+    document.title = `${p.name} | ذِكرى`;
+    const md = document.querySelector('meta[name=description]');
+    if (md) md.content = `${p.name}: ${p.description} ${L.gender[p.gender]}، ${Z.familyLine(p)}.`;
+  }
   document.getElementById('crumbs').insertAdjacentHTML('beforeend', ` / <bdi>${esc(p.name)}</bdi>`);
 
   let variant = p.variants.find((v) => v.stock > 0) || p.variants[0];
@@ -65,9 +70,10 @@ Z.boot('shop').then((cat) => {
     if (sz) { variant = p.variants.find((v) => v.size === +sz.dataset.size); update(); }
     const th = e.target.closest('[data-img]');
     if (th) { document.getElementById('main-img').src = th.dataset.img; document.querySelectorAll('[data-img]').forEach((b) => b.classList.toggle('on', b === th)); }
-    if (e.target.closest('#order-now,[data-order]')) { Z.cart.add(p.id, variant.size); location.href = 'checkout.html'; }
+    if (e.target.closest('#order-now,[data-order]')) { Z.track('AddToCart', { content_ids: [p.id], value: variant.price, currency: 'EGP' }); Z.cart.add(p.id, variant.size); location.href = 'checkout.html'; }
   });
   update();
+  Z.track('ViewContent', { content_ids: [p.id], content_type: 'product', value: variant.price, currency: 'EGP' });
 
   // Similar: shares a family, same gender or unisex scores higher
   const score = (x) => x.families.filter((f) => p.families.includes(f)).length * 2 + (x.gender === p.gender ? 1 : 0) + (x.gender === 'unisex' || p.gender === 'unisex' ? 0.5 : 0);

@@ -14,8 +14,10 @@ HEAD = '''<!doctype html>
 <link rel="apple-touch-icon" href="assets/brand/apple-touch-icon.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Alexandria:wght@300;400;500;600&family=Cormorant+Garamond:wght@500&family=El+Messiri:wght@500;600;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="assets/css/main.css">
+<link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Alexandria:wght@300;400;500;600&family=Cormorant+Garamond:wght@500&family=El+Messiri:wght@500;600;700&display=swap">
+<link href="https://fonts.googleapis.com/css2?family=Alexandria:wght@300;400;500;600&family=Cormorant+Garamond:wght@500&family=El+Messiri:wght@500;600;700&display=swap" rel="stylesheet" media="print" onload="this.media='all'">
+<noscript><link href="https://fonts.googleapis.com/css2?family=Alexandria:wght@300;400;500;600&family=Cormorant+Garamond:wght@500&family=El+Messiri:wght@500;600;700&display=swap" rel="stylesheet"></noscript>
+{preload}<link rel="stylesheet" href="assets/css/main.css">
 </head>
 <body>
 <div id="site-header"></div>
@@ -30,8 +32,10 @@ HEAD = '''<!doctype html>
 </html>
 '''
 
+HERO_PRELOAD = '''<link rel="preload" as="image" href="assets/img/products/mambo-no-05-3-640.webp" imagesrcset="assets/img/products/mambo-no-05-3-640.webp 640w, assets/img/products/mambo-no-05-3-1100.webp 1100w" imagesizes="(min-width:768px) 50vw, 100vw">
+'''
 def page(name, title, desc, body, script):
-    (ROOT / name).write_text(HEAD.format(title=title, desc=desc, body=body.strip(), script=script), encoding='utf-8')
+    (ROOT / name).write_text(HEAD.format(title=title, desc=desc, body=body.strip(), script=script, preload=HERO_PRELOAD if name == 'index.html' else ''), encoding='utf-8')
 
 FAMILIES = [('oud','عود','OUD'),('floral','ورد','ROSE'),('fruity','فواكه','FRUITY'),('oriental','شرقي','ORIENTAL'),('fresh','فريش','FRESH'),('woody','خشبي','WOODY')]
 fam_html = ''.join(f'<a class="fam" href="shop.html?family={k}"><div class="sw sw-{k}"></div><b>{a}</b><small>{e}</small></a>' for k,a,e in reversed(FAMILIES))
@@ -39,7 +43,7 @@ fam_html = ''.join(f'<a class="fam" href="shop.html?family={k}"><div class="sw s
 page('index.html', 'ذِكرى | عطور أونلاين بتوصيل لكل مصر',
  'متجر ذِكرى للعطور: رجالي وحريمي ويونيسكس، توصيل لكل محافظات مصر والدفع عند الاستلام.', f'''
 <section class="hero">
-  <div class="hero-img"><img src="assets/img/products/mambo-no-05-3.webp" alt="" fetchpriority="high" width="1121" height="1403"></div>
+  <div class="hero-img"><img src="assets/img/products/mambo-no-05-3-1100.webp" srcset="assets/img/products/mambo-no-05-3-640.webp 640w, assets/img/products/mambo-no-05-3-1100.webp 1100w" sizes="(min-width:768px) 50vw, 100vw" alt="" fetchpriority="high" width="960" height="1200"></div>
   <div class="content">
     <div class="tagline">Where memories linger</div>
     <h1>ريحة <em>تفضل</em><br>في الذاكرة</h1>
@@ -97,7 +101,7 @@ page('index.html', 'ذِكرى | عطور أونلاين بتوصيل لكل م�
 </div></section>
 
 <section class="statement">
-  <img src="assets/brand/logo-full-gold.webp" alt="ذِكرى — Where memories linger" loading="lazy" width="300" height="268">
+  <img src="assets/brand/logo-full-gold.webp" alt="ذِكرى — Where memories linger" loading="lazy" width="300" height="267" decoding="async">
   <p>كل ريحة بتحكي ذكرى.<br>اختار اللي تفضل معاك.</p>
 </section>
 ''', 'home')
@@ -118,6 +122,7 @@ page('shop.html', 'كل العطور | ذِكرى', 'كل عطور ذِكرى: �
       <div class="f-actions"><button class="btn btn-line" data-clear>امسح الكل</button><button class="btn btn-dark btn-block" data-close-filters>اعرض النتايج</button></div>
     </aside>
     <div>
+      <h2 class="sr-only">العطور</h2>
       <div class="active-filters" id="active-filters"></div>
       <div class="grid" id="grid"></div>
       <p class="empty" id="empty" hidden>مفيش عطور بالفلاتر دي. <button class="chip" data-clear>امسح الفلاتر</button></p>
@@ -190,7 +195,7 @@ print('ok')
 # ---------- Phase B: cart, checkout, order confirmation ----------
 NOINDEX = '<meta name="robots" content="noindex">'
 def page_noindex(name, title, body, script):
-    html = HEAD.format(title=title, desc='', body=body.strip(), script=script)
+    html = HEAD.format(title=title, desc='', body=body.strip(), script=script, preload='')
     html = html.replace('<meta name="description" content="">', NOINDEX)
     (ROOT / name).write_text(html, encoding='utf-8')
 
