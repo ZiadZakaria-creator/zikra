@@ -255,6 +255,7 @@
         <nav class="main-nav" aria-label="الرئيسية">${NAV.map(([h, l, k]) => `<a href="${h}" class="${k === active ? 'on' : ''}">${l}</a>`).join('')}</nav>
         <a class="logo" href="index.html" aria-label="ذِكرى — الرئيسية"><img src="assets/brand/logo-mark-gold.webp" alt="ذِكرى" width="80" height="58"></a>
         <div class="hdr-actions">
+          ${window.I18N ? I18N.toggles() : ''}
           <a class="icon-btn" href="shop.html" aria-label="ابحث في العطور">${I.search}</a>
           <a class="icon-btn" href="cart.html" aria-label="السلة">${I.bag}<span class="badge" data-cart-count></span></a>
         </div>
