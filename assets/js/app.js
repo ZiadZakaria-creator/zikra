@@ -1,0 +1,202 @@
+/* Zikra — shared storefront helpers (no framework, no build step). */
+(function () {
+  'use strict';
+
+  const LABELS = {
+    gender: { men: 'رجالي', women: 'حريمي', unisex: 'يونيسكس' },
+    genderEn: { men: 'FOR HIM', women: 'FOR HER', unisex: 'FOR EVERYONE' },
+    family: { woody: 'خشبي', fresh: 'فريش', oriental: 'شرقي', fruity: 'فواكه', floral: 'ورد', oud: 'عود' },
+    familyEn: { woody: 'WOODY', fresh: 'FRESH', oriental: 'ORIENTAL', fruity: 'FRUITY', floral: 'ROSE', oud: 'OUD' },
+    occasion: { daily: 'يومي', evening: 'سهرة', summer: 'صيفي', winter: 'شتوي', gift: 'هدايا' },
+    season: { summer: 'صيف', winter: 'شتا', all: 'طول السنة' },
+    time: { day: 'بالنهار', night: 'بالليل' },
+    line: { zikra: 'تركيبتنا', inspired: 'مستوحى' },
+    level: ['', 'خفيف', 'هادي', 'متوسط', 'قوي', 'قوي جداً']
+  };
+  const BUDGETS = [
+    { id: 'u300', label: 'أقل من 300 ج', min: 0, max: 299 },
+    { id: '300-600', label: '300 – 600 ج', min: 300, max: 600 },
+    { id: '600-1000', label: '600 – 1000 ج', min: 601, max: 1000 },
+    { id: 'o1000', label: 'أكتر من 1000 ج', min: 1001, max: Infinity }
+  ];
+
+  const I = {
+    menu: '<svg class="icon" viewBox="0 0 24 24"><path d="M4 7h16M4 12h16M10 17h10"/></svg>',
+    close: '<svg class="icon" viewBox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18"/></svg>',
+    bag: '<svg class="icon" viewBox="0 0 24 24"><path d="M6 8h12l-1 12H7L6 8z"/><path d="M9 8a3 3 0 0 1 6 0"/></svg>',
+    search: '<svg class="icon" viewBox="0 0 24 24"><circle cx="11" cy="11" r="6"/><path d="M20 20l-4-4"/></svg>',
+    home: '<svg class="icon" viewBox="0 0 24 24"><path d="M4 11l8-7 8 7v9H4z"/></svg>',
+    star: '<svg class="icon" viewBox="0 0 24 24"><path d="M12 3l2.5 5.5L20 9l-4 4 1 6-5-3-5 3 1-6-4-4 5.5-.5z"/></svg>',
+    truck: '<svg class="icon" viewBox="0 0 24 24"><path d="M3 7h11v9H3zM14 10h4l3 3v3h-7z"/><circle cx="7" cy="17" r="1.6"/><circle cx="17" cy="17" r="1.6"/></svg>',
+    cash: '<svg class="icon" viewBox="0 0 24 24"><rect x="3" y="6" width="18" height="12" rx="2"/><circle cx="12" cy="12" r="2.5"/></svg>',
+    chat: '<svg class="icon" viewBox="0 0 24 24"><path d="M4 20l1.5-4A8 8 0 1 1 8 18.5z"/></svg>',
+    ig: '<svg class="icon" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r=".6"/></svg>',
+    tt: '<svg class="icon" viewBox="0 0 24 24"><path d="M14 3v11.5a3.5 3.5 0 1 1-3.5-3.5"/><path d="M14 3c.5 2.5 2.3 4 5 4.2"/></svg>',
+    filter: '<svg class="icon" viewBox="0 0 24 24"><path d="M4 6h16M7 12h10M10 18h4"/></svg>',
+    wa: '<svg viewBox="0 0 24 24"><path d="M12 2a10 10 0 0 0-8.6 15.1L2 22l5-1.3A10 10 0 1 0 12 2zm5.3 14.1c-.2.6-1.3 1.2-1.8 1.2-.5.1-1 .1-3.3-.8-2.8-1.1-4.5-4-4.7-4.2-.1-.2-1.1-1.5-1.1-2.9s.7-2 1-2.3c.2-.3.5-.3.7-.3h.5c.2 0 .4 0 .6.5l.9 2.1c.1.2.1.4 0 .5l-.4.6c-.1.2-.3.3-.1.6.2.3.8 1.3 1.6 2 1.1 1 2 1.3 2.3 1.4.3.1.5.1.6-.1l.9-1.1c.2-.3.4-.2.7-.1l2 1c.3.1.5.2.5.3.1.2.1.9-.1 1.6z"/></svg>'
+  };
+
+  const esc = (s) => String(s ?? '').replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+  const money = (n) => Number(n).toLocaleString('en-US') + ' ج';
+
+  // ---------- Storage (guarded: private mode can throw) ----------
+  const store = {
+    get(k, d) { try { const v = localStorage.getItem(k); return v ? JSON.parse(v) : d; } catch (e) { return d; } },
+    set(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); } catch (e) { /* ignore */ } }
+  };
+
+  // ---------- Catalog ----------
+  let catalogPromise = null;
+  function loadCatalog() {
+    if (!catalogPromise) {
+      catalogPromise = fetch('data/catalog.json', { cache: 'no-cache' })
+        .then((r) => { if (!r.ok) throw new Error('catalog ' + r.status); return r.json(); });
+    }
+    return catalogPromise;
+  }
+  const minPrice = (p) => Math.min(...p.variants.map((v) => v.price));
+  const inStock = (p) => p.variants.some((v) => v.stock > 0);
+  const productUrl = (p) => 'product.html?p=' + encodeURIComponent(p.slug);
+  const familyLine = (p) => p.families.map((f) => LABELS.family[f]).join(' · ');
+  const subLine = (p) => (p.line === 'inspired' && p.inspiredBy) ? 'مستوحى من: ' + p.inspiredBy : LABELS.gender[p.gender];
+
+  function card(p) {
+    const ok = inStock(p);
+    const img = p.images[0]
+      ? `<img src="${esc(p.images[0].replace('.webp', '-sm.webp'))}" alt="${esc(p.name)}" loading="lazy" width="480" height="480">`
+      : '<div class="noimg">الصورة قريباً</div>';
+    const tester = p.variants.some((v) => v.tester) ? '<span class="tester">معاه تستر 3 مل</span>' : '';
+    return `<article class="p-card">
+      <div class="img">${ok ? `<span class="tag">${esc(LABELS.line[p.line] || '')}</span>` : '<span class="tag out">خلص</span>'}${img}${tester}</div>
+      <div class="body">
+        <h3 class="name"><bdi>${esc(p.name)}</bdi></h3>
+        <div class="sub">${esc(subLine(p))}</div>
+        <div class="fam-l">${esc(familyLine(p))}</div>
+        <div class="row">
+          <div class="price"><small>${p.variants.length > 1 ? 'يبدأ من' : ''}</small>${money(minPrice(p))}</div>
+          <button class="add" data-add="${esc(p.id)}" aria-label="أضف ${esc(p.name)} للسلة" ${ok ? '' : 'disabled'}>+</button>
+        </div>
+      </div>
+      <a class="stretch" href="${productUrl(p)}" aria-label="${esc(p.name)}"></a>
+    </article>`;
+  }
+
+  // ---------- Cart (full cart page comes in phase B) ----------
+  const CART_KEY = 'zikra_cart';
+  const cart = {
+    items() { return store.get(CART_KEY, []); },
+    count() { return cart.items().reduce((n, i) => n + i.qty, 0); },
+    add(id, size, qty = 1) {
+      const items = cart.items();
+      const hit = items.find((i) => i.id === id && i.size === size);
+      if (hit) hit.qty += qty; else items.push({ id, size, qty });
+      store.set(CART_KEY, items); updateBadges();
+    }
+  };
+  function updateBadges() {
+    const n = cart.count();
+    document.querySelectorAll('[data-cart-count]').forEach((b) => { b.textContent = n || ''; b.dataset.n = n; });
+  }
+
+  // ---------- Toast ----------
+  let toastTimer;
+  function toast(html) {
+    let t = document.querySelector('.toast');
+    if (!t) { t = document.createElement('div'); t.className = 'toast'; t.setAttribute('role', 'status'); document.body.appendChild(t); }
+    t.innerHTML = html; t.classList.add('show');
+    clearTimeout(toastTimer); toastTimer = setTimeout(() => t.classList.remove('show'), 2600);
+  }
+
+  // ---------- WhatsApp ----------
+  function waLink(settings, text) {
+    const num = (settings.whatsapp || '').replace(/\D/g, '');
+    if (!num) return 'contact.html';
+    return 'https://wa.me/' + num + '?text=' + encodeURIComponent(text);
+  }
+
+  // ---------- Layout ----------
+  const NAV = [
+    ['index.html', 'الرئيسية', 'home'], ['shop.html', 'كل العطور', 'shop'],
+    ['shop.html?gender=men', 'رجالي', 'men'], ['shop.html?gender=women', 'حريمي', 'women'],
+    ['shop.html?gender=unisex', 'يونيسكس', 'unisex'], ['shop.html?occasion=gift', 'الهدايا', 'gift'],
+    ['quiz.html', 'اعرف ريحتك', 'quiz']
+  ];
+
+  function renderLayout(active, settings, demo) {
+    const header = document.getElementById('site-header');
+    if (header) {
+      header.outerHTML = `${demo ? '<div class="demo-bar">نسخة تجريبية: الأسعار والمخزون والمكونات للعرض بس لحد ما تتظبط من لوحة التحكم.</div>' : ''}
+      <div class="announce">توصيل ${esc(settings.areas)} خلال ${esc(settings.deliveryDays)} · الدفع عند الاستلام</div>
+      <header class="site-header"><div class="wrap bar">
+        <button class="icon-btn menu-btn" data-open-menu aria-label="القائمة">${I.menu}</button>
+        <nav class="main-nav" aria-label="الرئيسية">${NAV.map(([h, l, k]) => `<a href="${h}" class="${k === active ? 'on' : ''}">${l}</a>`).join('')}</nav>
+        <a class="logo" href="index.html" aria-label="ذِكرى — الرئيسية"><img src="assets/brand/logo-mark-gold.webp" alt="ذِكرى" width="80" height="58"></a>
+        <div class="hdr-actions">
+          <a class="icon-btn" href="shop.html" aria-label="ابحث في العطور">${I.search}</a>
+          <a class="icon-btn" href="cart.html" aria-label="السلة">${I.bag}<span class="badge" data-cart-count></span></a>
+        </div>
+      </div></header>
+      <div class="drawer" id="drawer" aria-hidden="true"><div class="scrim" data-close-menu></div>
+        <nav class="panel" aria-label="القائمة"><button class="icon-btn close" data-close-menu aria-label="اقفل">${I.close}</button>
+          ${NAV.map(([h, l]) => `<a href="${h}">${l}</a>`).join('')}
+          <a href="about.html">عننا</a><a href="shipping.html">الشحن</a><a href="returns.html">الاستبدال والاسترجاع</a><a href="faq.html">الأسئلة الشائعة</a><a href="contact.html">تواصل معانا</a>
+        </nav></div>`;
+    }
+    const footer = document.getElementById('site-footer');
+    if (footer) {
+      const social = [settings.instagram && `<a href="${esc(settings.instagram)}" aria-label="إنستجرام" rel="noopener">${I.ig}</a>`, settings.tiktok && `<a href="${esc(settings.tiktok)}" aria-label="تيك توك" rel="noopener">${I.tt}</a>`].filter(Boolean).join('');
+      footer.outerHTML = `<footer class="site-footer"><div class="wrap">
+        <div class="cols">
+          <div><a class="logo" href="index.html"><img src="assets/brand/logo-mark-gold.webp" alt="ذِكرى" width="80" height="58" loading="lazy"></a>
+            <p>عطور مختارة بعناية، بتوصلك لحد البيت في ${esc(settings.areas)}.</p>${social ? `<div class="social" style="margin-top:12px">${social}</div>` : ''}</div>
+          <div><h4>المتجر</h4><ul><li><a href="shop.html">كل العطور</a></li><li><a href="shop.html?gender=men">رجالي</a></li><li><a href="shop.html?gender=women">حريمي</a></li><li><a href="shop.html?gender=unisex">يونيسكس</a></li><li><a href="quiz.html">اعرف ريحتك</a></li></ul></div>
+          <div><h4>مساعدة</h4><ul><li><a href="shipping.html">الشحن</a></li><li><a href="returns.html">الاستبدال والاسترجاع</a></li><li><a href="faq.html">الأسئلة الشائعة</a></li><li><a href="contact.html">تواصل معانا</a></li></ul></div>
+          <div><h4>ذِكرى</h4><ul><li><a href="about.html">عننا</a></li></ul></div>
+        </div>
+        <div class="copy">© ${new Date().getFullYear()} ذِكرى. أونلاين فقط.</div>
+      </div></footer>
+      <nav class="bnav" aria-label="تنقل سريع">
+        <a href="index.html" class="${active === 'home' ? 'on' : ''}">${I.home}الرئيسية</a>
+        <a href="shop.html" class="${['shop', 'men', 'women', 'unisex', 'gift'].includes(active) ? 'on' : ''}">${I.search}العطور</a>
+        <a href="quiz.html" class="${active === 'quiz' ? 'on' : ''}">${I.star}اعرف ريحتك</a>
+        <a href="cart.html" class="${active === 'cart' ? 'on' : ''}">${I.bag}السلة<span class="badge" data-cart-count></span></a>
+      </nav>
+      <a class="wa-fab" href="${waLink(settings, 'أهلاً ذِكرى، عندي سؤال')}" aria-label="كلمنا على واتساب" ${settings.whatsapp ? 'target="_blank" rel="noopener"' : ''}>${I.wa}</a>`;
+    }
+    const drawer = document.getElementById('drawer');
+    document.addEventListener('click', (e) => {
+      if (e.target.closest('[data-open-menu]')) { drawer.classList.add('open'); drawer.setAttribute('aria-hidden', 'false'); }
+      if (e.target.closest('[data-close-menu]')) { drawer.classList.remove('open'); drawer.setAttribute('aria-hidden', 'true'); }
+    });
+    updateBadges();
+  }
+
+  // Quick add from any card: first in-stock size
+  function bindQuickAdd(catalog) {
+    document.addEventListener('click', (e) => {
+      const btn = e.target.closest('[data-add]');
+      if (!btn) return;
+      e.preventDefault();
+      const p = catalog.products.find((x) => x.id === btn.dataset.add);
+      const v = p && p.variants.find((x) => x.stock > 0);
+      if (!v) return;
+      cart.add(p.id, v.size);
+      toast(`اتضاف <bdi>${esc(p.name)}</bdi> (${v.size} مل) للسلة <a href="cart.html">السلة</a>`);
+    });
+  }
+
+  async function boot(active) {
+    try {
+      const catalog = await loadCatalog();
+      renderLayout(active, catalog.settings, catalog.demo);
+      bindQuickAdd(catalog);
+      return catalog;
+    } catch (err) {
+      const main = document.querySelector('main');
+      if (main) main.insertAdjacentHTML('afterbegin', '<p class="empty">حصلت مشكلة في تحميل العطور. جرّب تعمل refresh.</p>');
+      throw err;
+    }
+  }
+
+  window.Z = { LABELS, BUDGETS, I, esc, money, store, loadCatalog, minPrice, inStock, productUrl, familyLine, subLine, card, cart, toast, waLink, boot };
+})();

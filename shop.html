@@ -1,0 +1,45 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>كل العطور | ذِكرى</title>
+<meta name="description" content="كل عطور ذِكرى: فلتر بالنوع وعائلة الريحة والمناسبة والحجم والسعر.">
+<meta name="theme-color" content="#0f0e0c">
+<link rel="icon" type="image/png" sizes="32x32" href="assets/brand/favicon-32.png">
+<link rel="apple-touch-icon" href="assets/brand/apple-touch-icon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Alexandria:wght@300;400;500;600&family=Cormorant+Garamond:wght@500&family=El+Messiri:wght@500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/css/main.css">
+</head>
+<body>
+<div id="site-header"></div>
+<main id="main">
+<section class="page-head"><div class="wrap"><div class="eyebrow">Shop</div><h1 id="shop-title">كل العطور</h1><p id="shop-sub">رجالي وحريمي ويونيسكس، كل الأحجام.</p></div></section>
+<div class="wrap">
+  <div class="shop-bar">
+    <button class="btn btn-line open-filters" data-open-filters style="min-height:40px;padding:0 16px">فلتر</button>
+    <span class="count" id="count"></span>
+    <label class="sr-only" for="sort">الترتيب</label>
+    <select id="sort"><option value="new">الأحدث</option><option value="price-asc">السعر: من الأقل</option><option value="price-desc">السعر: من الأعلى</option></select>
+  </div>
+  <div class="shop-layout">
+    <aside class="filters" id="filters" aria-label="الفلاتر">
+      <div class="f-head"><h2 style="font-size:20px">فلتر</h2><button class="icon-btn close" data-close-filters aria-label="اقفل">✕</button></div>
+      <div id="filter-groups"></div>
+      <div class="f-actions"><button class="btn btn-line" data-clear>امسح الكل</button><button class="btn btn-dark btn-block" data-close-filters>اعرض النتايج</button></div>
+    </aside>
+    <div>
+      <div class="active-filters" id="active-filters"></div>
+      <div class="grid" id="grid"></div>
+      <p class="empty" id="empty" hidden>مفيش عطور بالفلاتر دي. <button class="chip" data-clear>امسح الفلاتر</button></p>
+    </div>
+  </div>
+</div>
+</main>
+<div id="site-footer"></div>
+<script src="assets/js/app.js"></script>
+<script src="assets/js/shop.js"></script>
+</body>
+</html>

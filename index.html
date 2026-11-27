@@ -2,13 +2,85 @@
 <html lang="ar" dir="rtl">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
-<meta name="robots" content="noindex">
-<title>ذِكرى | Zikra</title>
-<!-- Temporary: points to the homepage mockup until phase A replaces this file -->
-<meta http-equiv="refresh" content="0; url=mockup/home.html">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>ذِكرى | عطور أونلاين في القاهرة والجيزة</title>
+<meta name="description" content="متجر ذِكرى للعطور: رجالي وحريمي ويونيسكس، توصيل القاهرة والجيزة خلال 3 أيام عمل والدفع عند الاستلام.">
+<meta name="theme-color" content="#0f0e0c">
+<link rel="icon" type="image/png" sizes="32x32" href="assets/brand/favicon-32.png">
+<link rel="apple-touch-icon" href="assets/brand/apple-touch-icon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Alexandria:wght@300;400;500;600&family=Cormorant+Garamond:wght@500&family=El+Messiri:wght@500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/css/main.css">
 </head>
-<body style="background:#0f0e0c;color:#c6a15b;font-family:sans-serif;text-align:center;padding:40px">
-<a href="mockup/home.html" style="color:#c6a15b">ذِكرى</a>
+<body>
+<div id="site-header"></div>
+<main id="main">
+<section class="hero">
+  <div class="hero-img"><img src="assets/img/design/hero.webp" alt="" fetchpriority="high" width="960" height="1200"></div>
+  <div class="content">
+    <div class="tagline">Where memories linger</div>
+    <h1>ريحة <em>تفضل</em><br>في الذاكرة</h1>
+    <p>اختار عطرك حسب ذوقك والمناسبة والميزانية، وإحنا نوصلهولك لحد البيت.</p>
+    <div class="ctas"><a class="btn btn-gold" href="shop.html">تسوّق العطور</a><a class="btn btn-ghost" href="quiz.html">اعرف ريحتك</a></div>
+    <div class="facts"><div><b>3 أيام عمل</b><span>توصيل القاهرة والجيزة</span></div><div><b>عند الاستلام</b><span>أو محفظة / إنستاباي</span></div><div><b>واتساب</b><span>نرد على أسئلتك</span></div></div>
+  </div>
+</section>
+
+<section class="sec"><div class="wrap">
+  <div class="sec-head"><div><div class="eyebrow">Shop by</div><h2>تسوّق حسب النوع</h2></div><a class="more" href="shop.html">كل العطور ←</a></div>
+  <div class="genders">
+    <a class="g-card" href="shop.html?gender=men"><img src="assets/img/design/men.webp" alt="" loading="lazy"><div class="txt"><div class="eyebrow">For him</div><b>رجالي</b><span data-gcount="men">تسوّق ←</span></div></a>
+    <a class="g-card" href="shop.html?gender=women"><img src="assets/img/design/women.webp" alt="" loading="lazy"><div class="txt"><div class="eyebrow">For her</div><b>حريمي</b><span data-gcount="women">تسوّق ←</span></div></a>
+    <a class="g-card" href="shop.html?gender=unisex"><img src="assets/img/design/unisex.webp" alt="" loading="lazy"><div class="txt"><div class="eyebrow">For everyone</div><b>يونيسكس</b><span data-gcount="unisex">تسوّق ←</span></div></a>
+  </div>
+</div></section>
+
+<section class="sec"><div class="wrap two-col">
+  <div><div class="sec-head"><div><div class="eyebrow">Occasion</div><h2>حسب المناسبة</h2></div></div>
+    <div class="chips"><a class="chip" href="shop.html?occasion=daily">يومي</a><a class="chip" href="shop.html?occasion=evening">سهرة</a><a class="chip" href="shop.html?occasion=summer">صيفي</a><a class="chip" href="shop.html?occasion=winter">شتوي</a><a class="chip" href="shop.html?occasion=gift">هدايا</a></div></div>
+  <div class="budget-col"><div class="sec-head"><div><div class="eyebrow">Budget</div><h2>حسب الميزانية</h2></div></div>
+    <div class="chips" id="budget-chips"></div></div>
+</div></section>
+
+<section class="sec"><div class="wrap">
+  <div class="sec-head"><div><div class="eyebrow">Scent family</div><h2>عائلة الريحة</h2></div></div>
+  <div class="families"><a class="fam" href="shop.html?family=woody"><div class="sw sw-woody"></div><b>خشبي</b><small>WOODY</small></a><a class="fam" href="shop.html?family=fresh"><div class="sw sw-fresh"></div><b>فريش</b><small>FRESH</small></a><a class="fam" href="shop.html?family=oriental"><div class="sw sw-oriental"></div><b>شرقي</b><small>ORIENTAL</small></a><a class="fam" href="shop.html?family=fruity"><div class="sw sw-fruity"></div><b>فواكه</b><small>FRUITY</small></a><a class="fam" href="shop.html?family=floral"><div class="sw sw-floral"></div><b>ورد</b><small>ROSE</small></a><a class="fam" href="shop.html?family=oud"><div class="sw sw-oud"></div><b>عود</b><small>OUD</small></a></div>
+</div></section>
+
+<section class="sec"><div class="wrap">
+  <div class="sec-head"><div><div class="eyebrow">New arrivals</div><h2>وصل حديثاً</h2></div><a class="more" href="shop.html?sort=new">كل العطور ←</a></div>
+  <div class="grid" id="new-grid"></div>
+</div></section>
+
+<section class="sec"><div class="wrap banner-row">
+  <div class="tester-card">
+    <div class="eyebrow">Try before you open</div>
+    <h3>جرّب قبل ما تفتح</h3>
+    <p>كل زجاجة 50 مل معاها تستر 3 مل من نفس الريحة. جرّبه على جلدك وسيبه ياخد وقته، وخلّي الزجاجة الكبيرة مقفولة لحد ما تتأكد إنها ريحتك.</p>
+    <div class="sizes"><div class="n"><b>50</b><span>مل زجاجتك</span></div><div class="plus">+</div><div class="n"><b>3</b><span>مل تستر مجاناً</span></div></div>
+  </div>
+  <a class="quiz-banner" href="quiz.html"><img src="assets/img/design/unisex.webp" alt="" loading="lazy">
+    <div class="txt"><div class="eyebrow" style="color:var(--gold-2)">Scent quiz</div><h3>مش عارف تختار؟</h3><p>جاوب على 5 أسئلة في دقيقة، ونرشحلك 3 عطور على ذوقك.</p><span class="btn btn-gold">ابدأ الاختبار</span></div></a>
+</div>
+<div class="wrap"><div class="gift-banner" style="margin-top:16px">
+  <img src="assets/img/design/women.webp" alt="" loading="lazy">
+  <div><div class="eyebrow">Gift sets</div><h3>باكدجات الهدايا</h3><p>هدية جاهزة في علبة ذِكرى، لأي مناسبة.</p><a class="btn btn-gold" href="shop.html?occasion=gift">شوف الهدايا</a></div>
+</div></div></section>
+
+<section class="sec"><div class="wrap facts-row">
+  <div class="fact"><svg class="icon" viewBox="0 0 24 24"><path d="M3 7h11v9H3zM14 10h4l3 3v3h-7z"/><circle cx="7" cy="17" r="1.6"/><circle cx="17" cy="17" r="1.6"/></svg><div><b>3 أيام عمل</b><span>القاهرة والجيزة</span></div></div>
+  <div class="fact"><svg class="icon" viewBox="0 0 24 24"><rect x="3" y="6" width="18" height="12" rx="2"/><circle cx="12" cy="12" r="2.5"/></svg><div><b>عند الاستلام</b><span>أو محفظة / إنستاباي</span></div></div>
+  <div class="fact"><svg class="icon" viewBox="0 0 24 24"><path d="M4 20l1.5-4A8 8 0 1 1 8 18.5z"/></svg><div><b>واتساب</b><span>نرد على أسئلتك</span></div></div>
+</div></section>
+
+<section class="statement">
+  <img src="assets/brand/logo-full-gold.webp" alt="ذِكرى — Where memories linger" loading="lazy" width="300" height="268">
+  <p>كل ريحة بتحكي ذكرى.<br>اختار اللي تفضل معاك.</p>
+</section>
+</main>
+<div id="site-footer"></div>
+<script src="assets/js/app.js"></script>
+<script src="assets/js/home.js"></script>
 </body>
 </html>

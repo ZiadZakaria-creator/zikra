@@ -1,0 +1,30 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="robots" content="noindex">
+<title>السلة | ذِكرى</title>
+<link rel="icon" type="image/png" sizes="32x32" href="assets/brand/favicon-32.png">
+<link href="https://fonts.googleapis.com/css2?family=Alexandria:wght@300;400;500;600&family=Cormorant+Garamond:wght@500&family=El+Messiri:wght@500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/css/main.css">
+</head>
+<body>
+<div id="site-header"></div>
+<main id="main">
+<section class="page-head"><div class="wrap"><div class="eyebrow">Cart</div><h1>السلة</h1><p>صفحة الطلب الكاملة جاية في المرحلة (ب).</p></div></section>
+<div class="wrap prose" id="cart-list"></div>
+</main>
+<div id="site-footer"></div>
+<script src="assets/js/app.js"></script>
+<script>
+// Temporary cart preview until phase B
+Z.boot('cart').then((cat) => {
+  const items = Z.cart.items();
+  const el = document.getElementById('cart-list');
+  if (!items.length) { el.innerHTML = '<p class="empty">السلة فاضية. <a class="chip" href="shop.html">تسوّق العطور</a></p>'; return; }
+  el.innerHTML = '<ul>' + items.map((i) => { const p = cat.products.find((x) => x.id === i.id); return p ? `<li><bdi>${Z.esc(p.name)}</bdi> · ${i.size} مل × ${i.qty}</li>` : ''; }).join('') + '</ul>';
+});
+</script>
+</body>
+</html>
