@@ -56,7 +56,9 @@
   }
   const minPrice = (p) => Math.min(...p.variants.map((v) => v.price));
   const inStock = (p) => p.variants.some((v) => v.stock > 0);
-  const productUrl = (p) => 'product.html?p=' + encodeURIComponent(p.slug);
+  // Deployed builds have pre-rendered product pages at p/<slug>/; local dev uses product.html?p=
+  let BUILT = false;
+  const productUrl = (p) => (BUILT ? 'p/' + encodeURIComponent(p.slug) + '/' : 'product.html?p=' + encodeURIComponent(p.slug));
   const familyLine = (p) => p.families.map((f) => LABELS.family[f]).join(' · ');
   const subLine = (p) => (p.line === 'inspired' && p.inspiredBy) ? 'مستوحى من: ' + p.inspiredBy : LABELS.gender[p.gender];
 
@@ -306,10 +308,34 @@
     });
   }
 
+  // Optional Meta Pixel / Google Analytics, set from the admin. Loaded after the page is idle.
+  function loadAnalytics(s) {
+    const go = () => {
+      if (s.gaId && /^G-[A-Z0-9]+$/.test(s.gaId)) {
+        const sc = document.createElement('script'); sc.async = true; sc.src = 'https://www.googletagmanager.com/gtag/js?id=' + s.gaId; document.head.appendChild(sc);
+        window.dataLayer = window.dataLayer || []; window.gtag = function () { window.dataLayer.push(arguments); };
+        window.gtag('js', new Date()); window.gtag('config', s.gaId);
+      }
+      if (s.pixelId && /^\d{6,20}$/.test(s.pixelId)) {
+        /* eslint-disable */
+        !function(f,b,e,v,n,t,s){if(f.fbq)return;n=f.fbq=function(){n.callMethod?n.callMethod.apply(n,arguments):n.queue.push(arguments)};if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';n.queue=[];t=b.createElement(e);t.async=!0;t.src=v;s=b.getElementsByTagName(e)[0];s.parentNode.insertBefore(t,s)}(window,document,'script','https://connect.facebook.net/en_US/fbevents.js');
+        window.fbq('init', s.pixelId); window.fbq('track', 'PageView');
+      }
+    };
+    if (s.gaId || s.pixelId) ('requestIdleCallback' in window ? requestIdleCallback(go, { timeout: 4000 }) : setTimeout(go, 2500));
+  }
+  const track = (event, data) => { try { if (window.fbq) window.fbq('track', event, data); if (window.gtag) window.gtag('event', event, data); } catch (e) { /* ignore */ } };
+  function registerSW() {
+    if ('serviceWorker' in navigator && location.protocol === 'https:') navigator.serviceWorker.register('sw.js').catch(() => {});
+  }
+
   async function boot(active) {
     try {
       const catalog = await loadCatalog();
+      BUILT = !!catalog.built;
       renderLayout(active, catalog.settings, catalog.demo);
+      loadAnalytics(catalog.settings);
+      registerSW();
       bindQuickAdd(catalog);
       return catalog;
     } catch (err) {
@@ -319,5 +345,5 @@
     }
   }
 
-  window.Z = { LABELS, BUDGETS, I, esc, money, store, loadCatalog, minPrice, inStock, productUrl, familyLine, subLine, card, cart, orders, checkCoupon, normPhone, validPhone, orderText, toast, waLink, boot };
+  window.Z = { track, LABELS, BUDGETS, I, esc, money, store, loadCatalog, minPrice, inStock, productUrl, familyLine, subLine, card, cart, orders, checkCoupon, normPhone, validPhone, orderText, toast, waLink, boot };
 })();

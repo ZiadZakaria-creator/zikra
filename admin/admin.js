@@ -116,7 +116,8 @@ function renderShell() {
   appEl.querySelectorAll('[data-tab]').forEach((b) => (b.onclick = () => { S.tab = b.dataset.tab; renderShell(); }));
   ({ orders: viewOrders, products: viewProducts, coupons: viewCoupons, settings: viewSettings })[S.tab]();
 }
-const publishNote = '<div class="a-note">تعديلات المنتجات والأسعار والشحن بتظهر على الموقع بعد النشر الجاي (بيتعمل أوتوماتيك، أو من GitHub Actions). الطلبات بتوصل هنا على طول.</div>';
+const PUBLISH_URL = 'https://github.com/ZiadZakaria-creator/zikra/actions/workflows/deploy.yml';
+const publishNote = `<div class="a-note">تعديلات المنتجات والأسعار والشحن بتظهر على الموقع في النشر الجاي: أوتوماتيك كل ساعة، أو فوراً من <a href="${PUBLISH_URL}" target="_blank" rel="noopener"><b>انشر دلوقتي</b></a> (Run workflow). الطلبات بتوصل هنا على طول.</div>`;
 
 // ---------- Orders ----------
 function priceIssues(o) {
@@ -586,7 +587,9 @@ async function viewSettings() {
       <div class="field"><label>اسم صاحب المحفظة (زي ما بيظهر في التحويل)</label><input name="walletName" value="${esc(s.walletName || '')}"></div>
       <div class="field"><label>الشريط اللي فوق الموقع</label><input name="announcement" value="${esc(s.announcement || '')}" maxlength="90"></div>
       <div class="field"><label>لينك إنستجرام</label><input name="instagram" dir="ltr" value="${esc(s.instagram || '')}"></div>
-      <div class="field"><label>لينك تيك توك</label><input name="tiktok" dir="ltr" value="${esc(s.tiktok || '')}"></div></div>
+      <div class="field"><label>لينك تيك توك</label><input name="tiktok" dir="ltr" value="${esc(s.tiktok || '')}"></div>
+      <div class="field"><label>Meta Pixel ID <span class="opt">(اختياري، أرقام بس)</span></label><input name="pixelId" dir="ltr" value="${esc(s.pixelId || '')}"></div>
+      <div class="field"><label>Google Analytics ID <span class="opt">(اختياري، بيبدأ بـ G-)</span></label><input name="gaId" dir="ltr" value="${esc(s.gaId || '')}"></div></div>
       <label class="check"><input type="checkbox" name="cod" ${s.payment?.cod !== false ? 'checked' : ''}> الدفع عند الاستلام</label>
       <label class="check"><input type="checkbox" name="wallet" ${s.payment?.wallet !== false ? 'checked' : ''}> محفظة / إنستاباي</label></div>
     <div class="box"><h3>مصاريف الشحن لكل محافظة</h3>
@@ -606,6 +609,7 @@ async function viewSettings() {
     const data = settingsDoc({
       ...s, whatsapp: wa ? '2' + wa : '', walletNumber: String(fd.get('walletNumber')).trim(), walletName: String(fd.get('walletName')).trim(),
       announcement: String(fd.get('announcement')).trim(), instagram: String(fd.get('instagram')).trim(), tiktok: String(fd.get('tiktok')).trim(),
+      pixelId: String(fd.get('pixelId')).replace(/\D/g, ''), gaId: String(fd.get('gaId')).trim().toUpperCase(),
       payment: { cod: !!fd.get('cod'), wallet: !!fd.get('wallet') }, governorates
     });
     await guard(() => setDoc(doc(db, 'settings', 'store'), data), 'اتحفظت الإعدادات');

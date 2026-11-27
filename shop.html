@@ -10,7 +10,9 @@
 <link rel="apple-touch-icon" href="assets/brand/apple-touch-icon.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Alexandria:wght@300;400;500;600&family=Cormorant+Garamond:wght@500&family=El+Messiri:wght@500;600;700&display=swap" rel="stylesheet">
+<link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Alexandria:wght@300;400;500;600&family=Cormorant+Garamond:wght@500&family=El+Messiri:wght@500;600;700&display=swap">
+<link href="https://fonts.googleapis.com/css2?family=Alexandria:wght@300;400;500;600&family=Cormorant+Garamond:wght@500&family=El+Messiri:wght@500;600;700&display=swap" rel="stylesheet" media="print" onload="this.media='all'">
+<noscript><link href="https://fonts.googleapis.com/css2?family=Alexandria:wght@300;400;500;600&family=Cormorant+Garamond:wght@500&family=El+Messiri:wght@500;600;700&display=swap" rel="stylesheet"></noscript>
 <link rel="stylesheet" href="assets/css/main.css">
 </head>
 <body>
@@ -31,6 +33,7 @@
       <div class="f-actions"><button class="btn btn-line" data-clear>امسح الكل</button><button class="btn btn-dark btn-block" data-close-filters>اعرض النتايج</button></div>
     </aside>
     <div>
+      <h2 class="sr-only">العطور</h2>
       <div class="active-filters" id="active-filters"></div>
       <div class="grid" id="grid"></div>
       <p class="empty" id="empty" hidden>مفيش عطور بالفلاتر دي. <button class="chip" data-clear>امسح الفلاتر</button></p>

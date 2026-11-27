@@ -1,0 +1,48 @@
+name: Build & deploy
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:        # "Run workflow" button = publish now
+  schedule:
+    - cron: '23 * * * *'    # hourly, so admin edits reach the site without a push
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: pip install pillow==11.0.0
+      - name: Check JavaScript syntax
+        run: for f in assets/js/*.js; do node --check "$f"; done
+      - name: Build site from Firestore
+        env:
+          SITE_URL: ${{ vars.SITE_URL || 'https://ziadzakaria-creator.github.io/zikra/' }}
+          CUSTOM_DOMAIN: ${{ vars.CUSTOM_DOMAIN }}
+        run: python tools/build.py   # exits non-zero on any problem -> nothing is deployed
+      - uses: actions/configure-pages@v5
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: _site
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@v4

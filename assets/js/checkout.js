@@ -107,6 +107,7 @@ Z.boot('cart').then((cat) => {
     try {
       order.createdAt = new Date().toISOString();
       await Z.orders.save(order);
+      Z.track('Purchase', { value: order.total, currency: 'EGP', content_ids: order.items.map((i) => i.id) });
       if ($('remember').checked) Z.store.set('zikra_customer', { name: order.customer.name, phone: order.customer.phone, phone2: order.customer.phone2, gov: g.id, zone: order.address.zoneName, street: order.address.street, landmark: order.address.landmark });
       else Z.store.set('zikra_customer', null);
       Z.cart.clear();

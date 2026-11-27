@@ -1,7 +1,7 @@
 /* Zikra storefront styles — mobile first, RTL */
 :root{
   --ink:#0f0e0c; --ink-2:#1a1814; --cream:#f6f0e6; --cream-2:#ece3d3;
-  --gold:#c6a15b; --gold-2:#e2c88f; --muted:#7a7266; --line:#e2d8c6; --soft:#cfc6b6;
+  --gold:#c6a15b; --gold-2:#e2c88f; --muted:#6b6458; --gold-ink:#7d5f27; --line:#e2d8c6; --soft:#cfc6b6;
   --white:#fff; --danger:#a8432f; --wa:#25d366;
   --r:16px; --r-lg:24px;
   --head:'El Messiri',serif; --body:'Alexandria',system-ui,sans-serif; --latin:'Cormorant Garamond',serif;
@@ -20,7 +20,7 @@ input,select,textarea{font:inherit}
 .icon{width:24px;height:24px;stroke:currentColor;fill:none;stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round}
 
 /* Type */
-.eyebrow{font-family:var(--latin);font-weight:500;letter-spacing:.2em;font-size:12px;color:var(--gold);text-transform:uppercase}
+.eyebrow{font-family:var(--latin);font-weight:500;letter-spacing:.2em;font-size:12px;color:var(--gold-ink);text-transform:uppercase}
 h1,h2,h3{font-family:var(--head);line-height:1.25}
 h2{font-size:26px;font-weight:600}
 
@@ -113,13 +113,13 @@ h2{font-size:26px;font-weight:600}
 .p-card .img img{width:100%;height:100%;object-fit:cover;transition:transform .4s}
 .p-card:hover .img img{transform:scale(1.04)}
 .p-card .noimg{width:100%;height:100%;display:grid;place-items:center;color:var(--muted);font-size:12px;background:var(--cream-2)}
-.tag{position:absolute;top:8px;right:8px;background:var(--ink);color:var(--gold-2);font-size:10px;padding:3px 8px;border-radius:6px;z-index:1}
+.tag{position:absolute;top:8px;right:8px;background:var(--ink);color:var(--gold-2);font-size:11px;padding:3px 8px;border-radius:6px;z-index:1}
 .tag.out{background:var(--muted);color:var(--white)}
-.tester{position:absolute;bottom:8px;right:8px;background:rgba(255,255,255,.92);color:var(--ink);font-size:10px;padding:3px 8px;border-radius:6px;border:1px solid var(--line)}
+.tester{position:absolute;bottom:8px;right:8px;background:rgba(255,255,255,.92);color:var(--ink);font-size:11px;padding:3px 8px;border-radius:6px;border:1px solid var(--line)}
 .p-card .body{padding:12px 12px 14px;display:flex;flex-direction:column;gap:2px;flex:1}
 .p-card .name{font-family:var(--head);font-weight:600;font-size:17px;line-height:1.3}
-.p-card .sub{font-size:11px;color:var(--muted)}
-.p-card .fam-l{font-size:11px;color:var(--gold)}
+.p-card .sub{font-size:12px;color:var(--muted)}
+.p-card .fam-l{font-size:12px;color:var(--gold-ink)}
 .p-card .row{display:flex;justify-content:space-between;align-items:center;margin-top:auto;padding-top:10px}
 .price{font-weight:600;font-size:15px}
 .price small{font-weight:400;color:var(--muted);font-size:11px;margin-inline-end:4px}
@@ -159,7 +159,7 @@ h2{font-size:26px;font-weight:600}
 
 /* Brand statement */
 .statement{background:var(--ink);color:var(--cream);text-align:center;padding:56px var(--pad);margin-top:40px}
-.statement img{width:220px;margin:0 auto 18px}
+.statement img{width:220px;height:auto;margin:0 auto 18px}
 .statement p{font-family:var(--head);font-size:20px;line-height:1.6}
 
 /* Footer */
@@ -171,7 +171,7 @@ h2{font-size:26px;font-weight:600}
 .site-footer .logo img{height:58px;margin-bottom:10px}
 .social{display:flex;gap:16px}
 .social .icon{color:var(--gold);width:22px;height:22px}
-.copy{border-top:1px solid rgba(198,161,91,.2);margin-top:24px;padding-top:16px;font-size:12px;color:var(--muted)}
+.copy{border-top:1px solid rgba(198,161,91,.2);margin-top:24px;padding-top:16px;font-size:12px;color:#a8a090}
 
 /* Bottom nav + FAB */
 .bnav{position:fixed;bottom:0;inset-inline:0;z-index:30;height:64px;background:var(--white);border-top:1px solid var(--line);display:grid;grid-template-columns:repeat(4,1fr)}
@@ -193,6 +193,7 @@ body:has(.sticky-buy) .wa-fab{bottom:142px}
 .page-head{background:var(--ink);color:var(--cream);padding:32px 0 28px}
 .page-head h1{font-size:32px}
 .page-head p{color:var(--soft);font-size:14px;margin-top:4px}
+.page-head .eyebrow,.tester-card .eyebrow,.statement .eyebrow{color:var(--gold)}
 .crumbs{font-size:12px;color:var(--muted);padding:12px 0}
 .crumbs a:hover{color:var(--ink)}
 
@@ -236,7 +237,7 @@ body:has(.sticky-buy) .wa-fab{bottom:142px}
 .info-block h2{font-size:20px;margin-bottom:12px}
 .pyramid{display:grid;gap:10px}
 .pyramid .lvl{display:grid;grid-template-columns:72px 1fr;gap:10px;align-items:start}
-.pyramid .lvl b{font-size:13px;color:var(--gold)}
+.pyramid .lvl b{font-size:13px;color:var(--gold-ink)}
 .pyramid .lvl span{font-size:14px}
 .meter{display:grid;grid-template-columns:72px 1fr 64px;gap:10px;align-items:center;font-size:13px;margin-bottom:8px}
 .meter .track{height:8px;background:var(--cream-2);border-radius:4px;overflow:hidden}
