@@ -46,14 +46,14 @@ service cloud.firestore {
       return request.resource.data.get(k, 0) - prev(k);
     }
     function validVisit() {
-      let srcs = ['s_direct', 's_facebook', 's_instagram', 's_tiktok', 's_google', 's_whatsapp', 's_other'];
+      let srcs = ['s_direct', 's_facebook', 's_instagram', 's_tiktok', 's_google', 's_whatsapp', 's_qr', 's_other'];
       let d = request.resource.data;
       return d.keys().hasOnly(['v'].concat(srcs))
         && d.v is int && step('v') == 1
         && step('s_direct') + step('s_facebook') + step('s_instagram') + step('s_tiktok')
-           + step('s_google') + step('s_whatsapp') + step('s_other') == 1
+           + step('s_google') + step('s_whatsapp') + step('s_qr') + step('s_other') == 1
         && step('s_direct') >= 0 && step('s_facebook') >= 0 && step('s_instagram') >= 0 && step('s_tiktok') >= 0
-        && step('s_google') >= 0 && step('s_whatsapp') >= 0 && step('s_other') >= 0;
+        && step('s_google') >= 0 && step('s_whatsapp') >= 0 && step('s_qr') >= 0 && step('s_other') >= 0;
     }
 
     match /orders/{id} {

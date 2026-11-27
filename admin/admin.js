@@ -561,7 +561,7 @@ function couponState(c) {
   return ['شغال', 'st-delivered'];
 }
 // ---------- Visits ----------
-const SRC = [['direct', 'دخول مباشر'], ['instagram', 'إنستجرام'], ['facebook', 'فيسبوك'], ['tiktok', 'تيك توك'], ['google', 'جوجل'], ['whatsapp', 'واتساب'], ['other', 'مواقع تانية']];
+const SRC = [['direct', 'دخول مباشر'], ['instagram', 'إنستجرام'], ['facebook', 'فيسبوك'], ['tiktok', 'تيك توك'], ['google', 'جوجل'], ['whatsapp', 'واتساب'], ['qr', 'كود QR'], ['other', 'مواقع تانية']];
 const cairoDay = (d) => new Intl.DateTimeFormat('en-CA', { timeZone: 'Africa/Cairo' }).format(d);
 async function viewVisits() {
   const v = $('#view');

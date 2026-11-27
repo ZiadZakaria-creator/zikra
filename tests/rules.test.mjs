@@ -76,6 +76,7 @@ await t('nobody can make themselves admin', () => assertFails(setDoc(doc(strange
 const visit = (db, day, src) => setDoc(doc(db, 'stats', day), { v: increment(1), ['s_' + src]: increment(1) }, { merge: true });
 await t('guest can count a visit on a new day', () => assertSucceeds(visit(guest, '2026-11-27', 'direct')));
 await t('guest can count a second visit', () => assertSucceeds(visit(guest, '2026-11-27', 'instagram')));
+await t('guest can count a QR visit', () => assertSucceeds(visit(guest, '2026-11-28', 'qr')));
 await t('reject adding 5 visitors at once', () => assertFails(setDoc(doc(guest, 'stats/2026-11-27'), { v: increment(5), s_direct: increment(5) }, { merge: true })));
 await t('reject visitor without source', () => assertFails(setDoc(doc(guest, 'stats/2026-11-27'), { v: increment(1) }, { merge: true })));
 await t('reject two sources in one visit', () => assertFails(setDoc(doc(guest, 'stats/2026-11-27'), { v: increment(1), s_direct: increment(1), s_google: increment(1) }, { merge: true })));

@@ -339,9 +339,10 @@
     let ref = ''; try { ref = document.referrer ? new URL(document.referrer).hostname : ''; } catch (e) { /* ignore */ }
     if (ref === location.hostname) ref = '';
     const hit = (re) => re.test(utm) || re.test(ref);
+    if (utm === 'qr') return 'qr'; // printed codes (cards, boxes, flyers)
     if (/Instagram/.test(ua) || hit(/instagram|^ig$/)) return 'instagram';
     if (/FBAN|FBAV/.test(ua) || q.has('fbclid') || hit(/facebook|^fb$|fb\.com/)) return 'facebook';
-    if (q.has('ttclid') || hit(/tiktok/)) return 'tiktok';
+    if (/musical_ly|BytedanceWebview|TikTok/i.test(ua) || q.has('ttclid') || hit(/tiktok/)) return 'tiktok';
     if (q.has('gclid') || hit(/google/)) return 'google';
     if (hit(/whatsapp|wa\.me/)) return 'whatsapp';
     return utm || ref ? 'other' : 'direct';
