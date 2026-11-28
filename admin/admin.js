@@ -321,7 +321,7 @@ function viewProducts() {
 // ---------- Excel import / export ----------
 // One row per product size. Rows with the same slug belong to the same product.
 const XL = 'https://cdn.sheetjs.com/xlsx-0.20.3/package/xlsx.mjs';
-const COLS = ['الرابط', 'اسم العطر', 'لمين', 'النوع', 'مستوحى من', 'عائلة الريحة', 'المناسبة', 'الحجم (مل)', 'السعر', 'المخزون', 'معاه تستر', 'ظاهر'];
+const COLS = ['الرابط', 'اسم العطر', 'لمين', 'النوع', 'مستوحى من', 'عائلة الريحة', 'المناسبة', 'الحجم (مل)', 'السعر', 'المخزون', 'معاه تستر', 'ظاهر', 'المقدمة', 'القلب', 'القاعدة'];
 const rev = (map) => Object.fromEntries(Object.entries(map).map(([k, v]) => [v, k]));
 const yes = (v) => ['نعم', 'ايوه', 'أيوه', 'yes', 'y', 'true', '1', '✓'].includes(String(v ?? '').trim().toLowerCase());
 const splitList = (v) => String(v ?? '').split(/[,،\/]/).map((x) => x.trim()).filter(Boolean);
@@ -332,10 +332,11 @@ async function exportExcel() {
   const src = S.products.length ? S.products : (await (await fetch('../data/catalog.json', { cache: 'no-cache' })).json()).products;
   for (const p of src) for (const v of p.variants || []) {
     rows.push([p.slug, p.name, L.gender[p.gender] || '', L.line[p.line] || '', p.inspiredBy || '', (p.families || []).map((f) => L.family[f]).join('، '),
-      (p.occasions || []).map((o) => L.occasion[o]).join('، '), v.size, v.price, v.stock, v.tester ? 'نعم' : 'لا', p.active === false ? 'لا' : 'نعم']);
+      (p.occasions || []).map((o) => L.occasion[o]).join('، '), v.size, v.price, v.stock, v.tester ? 'نعم' : 'لا', p.active === false ? 'لا' : 'نعم',
+      ...['top', 'heart', 'base'].map((k) => (p.notes?.[k] || []).join('، '))]);
   }
   const ws = X.utils.aoa_to_sheet(rows);
-  ws['!cols'] = [16, 20, 10, 10, 18, 22, 22, 10, 10, 10, 10, 8].map((w) => ({ wch: w }));
+  ws['!cols'] = [16, 20, 10, 10, 18, 22, 22, 10, 10, 10, 10, 8, 30, 30, 36].map((w) => ({ wch: w }));
   ws['!views'] = [{ RTL: true }];
   const wb = X.utils.book_new(); X.utils.book_append_sheet(wb, ws, 'المنتجات');
   X.writeFile(wb, `zikra-products-${new Date().toISOString().slice(0, 10)}.xlsx`);
@@ -373,6 +374,9 @@ async function importExcel(file) {
       gender: pick('لمين', G, base.gender), line: pick('النوع', LN, base.line || 'zikra'),
       inspiredBy: String(r['مستوحى من']).trim() || base.inspiredBy || '',
       families: pickList('عائلة الريحة', F, base.families || []), occasions: pickList('المناسبة', O, base.occasions || []),
+      // Notes: only replaced when at least one of the three columns is filled
+      notes: ['المقدمة', 'القلب', 'القاعدة'].some((c) => String(r[c] ?? '').trim())
+        ? { top: splitList(r['المقدمة']), heart: splitList(r['القلب']), base: splitList(r['القاعدة']) } : (base.notes || { top: [], heart: [], base: [] }),
       variants: g.rows.map(({ size, price, stock, tester }) => ({ size, price, stock, tester })).sort((a, b) => a.size - b.size),
       active: String(r['ظاهر']).trim() ? yes(r['ظاهر']) : base.active !== false
     };
@@ -389,7 +393,7 @@ function showImportPreview(plan, errors, total) {
   const m = document.createElement('div'); m.className = 'modal';
   const diff = (x) => x.isNew ? '<span class="st st-new">جديد</span>' : (x.before.variants || []).map((v) => `${v.size}مل ${money(v.price)}/${v.stock}`).join('، ') + ' ← ';
   m.innerHTML = `<div class="sheet"><div class="sheet-head"><h2>مراجعة الاستيراد</h2><button class="icon-btn" data-close aria-label="اقفل">✕</button></div>
-    ${errors.length ? `<div class="a-note"><b>لازم تصلّح دول في الشيت الأول (مفيش حاجة اتحفظت):</b><br>${errors.map(esc).join('<br>')}</div>` : `<p>${plan.filter((x) => x.isNew).length} منتج جديد، و${plan.filter((x) => !x.isNew).length} هيتحدّث. الصور والوصف والمكونات مش بتتغير من الشيت.</p>`}
+    ${errors.length ? `<div class="a-note"><b>لازم تصلّح دول في الشيت الأول (مفيش حاجة اتحفظت):</b><br>${errors.map(esc).join('<br>')}</div>` : `<p>${plan.filter((x) => x.isNew).length} منتج جديد، و${plan.filter((x) => !x.isNew).length} هيتحدّث. الصور والوصف مش بيتغيروا من الشيت. المكونات بتتغير لو كتبتها في أعمدة المقدمة / القلب / القاعدة.</p>`}
     <div class="box"><table class="a-table"><thead><tr><th>العطر</th><th>قبل ← بعد (الحجم السعر/المخزون)</th><th>ظاهر</th></tr></thead><tbody>
     ${plan.map((x) => `<tr><td><bdi>${esc(x.p.name)}</bdi><div class="meta" dir="ltr">${esc(x.p.slug)}</div></td><td>${diff(x)}<b>${x.p.variants.map((v) => `${v.size}مل ${money(v.price)}/${v.stock}${v.tester ? ' +تستر' : ''}`).join('، ')}</b></td><td>${x.p.active ? 'نعم' : 'لا'}</td></tr>`).join('')}
     </tbody></table></div>
